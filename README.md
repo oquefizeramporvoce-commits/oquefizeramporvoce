@@ -19,23 +19,28 @@ scripts/
   audit.py              percorre todas as páginas e aponta erros e links sem destino (Playwright)
   shots.py, shots_home.py  capturas de tela para conferência
 site/                   o site: uma página só, sem etapa de build de front-end
-.github/workflows/      atualização semanal e publicação no GitHub Pages
+.github/workflows/      atualização semanal dos dados
+wrangler.jsonc          configuração da publicação na Cloudflare
 ```
 
 ## Atualização automática
 
-O workflow `.github/workflows/atualizar-e-publicar.yml` roda toda segunda-feira às 6h17 (Brasília):
+O workflow `.github/workflows/atualizar-dados.yml` roda toda segunda-feira às 6h17 (Brasília):
 
 1. `scripts/coletar.py` baixa os dados das APIs.
 2. `scripts/build.py .` gera os arquivos do site.
-3. Se algo mudou, grava um commit "Dados atualizados em DD/MM/AAAA".
-4. Publica a pasta `site/` no GitHub Pages.
+3. Se algo mudou, grava um commit "Dados atualizados em DD/MM/AAAA" na `main`.
+4. A Cloudflare vê o push e publica o site de novo.
 
-Para rodar na hora: aba **Actions** > **Atualizar dados e publicar** > **Run workflow**.
+Para rodar na hora: aba **Actions** > **Atualizar dados** > **Run workflow**.
 
-### Ligar o GitHub Pages (uma vez)
+## Publicação na Cloudflare
 
-Em **Settings > Pages**, em *Build and deployment*, escolha **Source: GitHub Actions**.
+O site é publicado como Worker com arquivos estáticos (plano gratuito): a Cloudflare só serve a pasta `site/`, sem código no servidor. A configuração está em `wrangler.jsonc`.
+
+Para recriar o projeto: **Compute > Workers & Pages > Create** > importar o repositório do GitHub, com **Deploy command** `npx wrangler deploy` e sem build command. Endereço atual: https://oquefizeramporvoce.oquefizeramporvoce.workers.dev
+
+Não ative o Web Analytics da Cloudflare sem antes atualizar a Política de Privacidade e a de Cookies: hoje elas dizem que o site não mede audiência.
 
 ### Proteções
 
