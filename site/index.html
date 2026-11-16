@@ -1,0 +1,1206 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>O que eles fizeram por você</title>
+<style>
+/* Fonte hospedada junto com o site (licença SIL OFL 1.1): nenhum pedido a servidores de terceiros. */
+@font-face{font-family:'Atkinson Hyperlegible Next';font-style:normal;font-weight:400;font-display:swap;src:url(fonts/atkinson-hyperlegible-next-latin-400-normal.woff2) format('woff2');}
+@font-face{font-family:'Atkinson Hyperlegible Next';font-style:normal;font-weight:500;font-display:swap;src:url(fonts/atkinson-hyperlegible-next-latin-500-normal.woff2) format('woff2');}
+@font-face{font-family:'Atkinson Hyperlegible Next';font-style:normal;font-weight:700;font-display:swap;src:url(fonts/atkinson-hyperlegible-next-latin-700-normal.woff2) format('woff2');}
+@font-face{font-family:'Atkinson Hyperlegible Next';font-style:normal;font-weight:800;font-display:swap;src:url(fonts/atkinson-hyperlegible-next-latin-800-normal.woff2) format('woff2');}
+/* Layout: uma coluna alinhada à esquerda, listas com fios em vez de cartões; a cor aparece só nos dados (o trilho de situação e o painel de votos). */
+:root{
+  /* algodão egípcio: fundo bege claro, tinta marrom-acinzentada, azul petróleo como destaque */
+  --bg:#f4efe6; --card:#fbf8f2; --surface:#ebe4d7; --ink:#2b2620; --muted:#6b6255; --line:#dcd2c2; --accent:#2e5266;
+  --map:#e3d9c7; --map-h:#c9b89b; --map-line:#f4efe6;
+  --lei:#4f8a63; --apr:#4f97a3; --and:#6a84c0; --par:#cf9443; --ape:#a597c2; --enc:#b3a998;
+  --sim:#4f8a63; --nao:#c0564b; --abs:#c7a33b; --obs:#8a70b5; --aus:#d6cdbd;
+  --font:"Atkinson Hyperlegible Next","Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --w:1120px;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:17px;line-height:1.55;font-variant-numeric:tabular-nums}
+a{color:var(--accent);text-underline-offset:3px}
+a:hover{text-decoration-thickness:2px}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px;border-radius:3px}
+h1,h2,h3{text-wrap:balance;line-height:1.15;margin:0}
+p{margin:0}
+ul,ol{margin:0;padding:0;list-style:none}
+button,input,select{font:inherit;color:inherit}
+.wrap{max-width:var(--w);margin:0 auto;padding:0 20px}
+.skip{position:absolute;left:-9999px}
+.skip:focus{left:20px;top:10px;background:var(--bg);padding:8px 12px;z-index:5}
+
+/* cabeçalho */
+.top{border-bottom:1px solid var(--line)}
+.top{position:sticky;top:0;z-index:10;background:rgba(244,239,230,.94);backdrop-filter:blur(6px)}
+.top .wrap{display:flex;flex-wrap:wrap;align-items:center;gap:10px 24px;padding-top:12px;padding-bottom:12px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:1.02rem;white-space:nowrap;color:var(--ink);text-decoration:none;letter-spacing:-.01em}
+.brand .mark{display:flex;width:34px;height:12px;border-radius:2px;overflow:hidden}
+.brand .mark i{display:block;height:100%}
+.nav{display:flex;flex-wrap:wrap;gap:4px 18px;flex:1;font-size:.97rem}
+@media(max-width:860px){.nav{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;-webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 28px),transparent);mask-image:linear-gradient(90deg,#000 calc(100% - 28px),transparent);padding-right:28px}.nav::-webkit-scrollbar{display:none}.nav a{white-space:nowrap}}
+.nav a{color:var(--ink);text-decoration:none;padding:4px 0;border-bottom:3px solid transparent}
+.nav a:hover{border-bottom-color:var(--line)}
+.nav a[aria-current="page"]{border-bottom-color:var(--accent);font-weight:700}
+.search{display:flex;gap:6px}
+.search input{width:180px;max-width:60vw}
+input[type=search],input[type=text],select{background:var(--card);border:1px solid var(--muted);border-radius:6px;padding:7px 10px;min-height:40px}
+.btn{background:var(--ink);color:var(--bg);border:1px solid var(--ink);border-radius:6px;padding:7px 14px;min-height:40px;cursor:pointer;font-weight:700}
+.btn.ghost{background:transparent;color:var(--ink);border-color:var(--muted);font-weight:500}
+.btn:hover{opacity:.88}
+
+main{padding:36px 0 72px;min-height:60vh}
+.stack{display:flex;flex-direction:column;gap:44px}
+.block{display:flex;flex-direction:column;gap:16px}
+.lead{font-size:1.12rem;color:var(--muted);max-width:62ch}
+.muted{color:var(--muted)}
+.small{font-size:.9rem}
+h1{font-size:clamp(1.9rem,4.6vw,3.25rem);font-weight:800;letter-spacing:-.025em;max-width:22ch}
+h1.page{font-size:clamp(1.6rem,3.4vw,2.3rem);max-width:30ch}
+h2{font-size:1.35rem;font-weight:800;letter-spacing:-.01em}
+h3{font-size:1.02rem;font-weight:700}
+.crumb{font-size:.92rem;color:var(--muted)}
+.crumb a{color:var(--muted)}
+
+/* trilho: barra empilhada das situações */
+.trilho{display:flex;height:34px;border-radius:5px;overflow:hidden;background:var(--surface);gap:2px}
+.trilho.mini{height:10px;border-radius:3px;gap:1px}
+.trilho i{display:block;height:100%;min-width:2px}
+.b-lei{background:var(--lei)} .b-apr{background:var(--apr)} .b-and{background:var(--and)}
+.b-par{background:var(--par)} .b-ape{background:var(--ape)} .b-enc{background:var(--enc)}
+.legend{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px 28px}
+.legend.mini{grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:6px 16px;font-size:.9rem;margin-top:10px}
+.legend.mini li{align-items:center}
+.legend.mini p{display:none}
+.legend li{display:grid;grid-template-columns:14px 1fr;gap:2px 10px;align-items:baseline;align-content:start}
+.legend .sw{width:14px;height:14px;border-radius:3px;align-self:center}
+.legend b{font-weight:700}
+.legend .n{font-weight:800}
+.legend p{grid-column:2;color:var(--muted);font-size:.92rem;line-height:1.4}
+.feitos-h .st{white-space:normal}
+.sw{display:inline-block;width:11px;height:11px;border-radius:2px;flex:none}
+.st{display:inline-flex;align-items:center;gap:7px;font-weight:700;white-space:nowrap}
+
+/* controles */
+.seg{display:inline-flex;flex-wrap:wrap;align-self:flex-start;border:1px solid var(--muted);border-radius:7px;overflow:hidden}
+.seg button{background:transparent;border:0;padding:7px 14px;min-height:40px;cursor:pointer;border-right:1px solid var(--muted)}
+.seg button:last-child{border-right:0}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg);font-weight:700}
+.filters{display:flex;flex-wrap:wrap;gap:10px 12px;align-items:center}
+.chip{display:inline-flex;align-items:center;gap:7px;background:transparent;border:1px solid var(--line);border-radius:999px;padding:5px 12px;min-height:36px;cursor:pointer}
+.chip[aria-pressed="true"]{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink);font-weight:700}
+.chip .c{color:var(--muted);font-weight:400}
+
+/* listas */
+.rows{border-top:1px solid var(--line)}
+.rows>li{border-bottom:1px solid var(--line);padding:14px 0}
+.tema-row{display:grid;grid-template-columns:minmax(200px,1.1fr) 2fr auto;gap:8px 22px;align-items:center;color:var(--ink);text-decoration:none}
+.tema-row:hover .tn{text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:3px}
+.tema-row .tn{font-weight:700;font-size:1.08rem}
+.tema-row .tc{color:var(--muted);font-size:.92rem;text-align:right;white-space:nowrap}
+.proj{display:flex;flex-direction:column;gap:6px}
+.proj-main{display:grid;grid-template-columns:118px 1fr;gap:4px 14px;color:var(--ink);text-decoration:none;align-items:baseline}
+.proj-id{font-weight:800;white-space:nowrap}
+.proj-title{line-height:1.4}
+.proj-main:hover .proj-title{text-decoration:underline;text-underline-offset:3px}
+.proj-meta{display:flex;flex-wrap:wrap;gap:4px 20px;padding-left:132px;font-size:.92rem;color:var(--muted)}
+.proj-meta .st{color:var(--ink)}
+.more{align-self:flex-start}
+.empty{padding:28px 0;color:var(--muted)}
+
+/* votos */
+.vote-row{display:grid;grid-template-columns:96px 1fr 210px;gap:6px 18px;align-items:start;color:var(--ink);text-decoration:none}
+.vote-row:hover .vt{text-decoration:underline;text-underline-offset:3px}
+.vote-row .vd{color:var(--muted);font-size:.92rem;line-height:1.5}
+.vote-row .vt b{font-weight:800}
+.placar{display:flex;flex-direction:column;gap:5px;font-size:.9rem}
+.pbar{display:flex;height:10px;border-radius:3px;overflow:hidden;background:var(--aus);gap:1px}
+.pbar i{display:block;height:100%}
+.v1{background:var(--sim)} .v2{background:var(--nao)} .v3{background:var(--abs)} .v4{background:var(--obs)}
+.v5{background:var(--ink)} .v6,.v7,.v8,.v0{background:var(--aus)}
+.res{font-weight:700}
+.painel{display:flex;flex-direction:column;gap:5px;padding:14px;background:var(--surface);border-radius:8px}
+.bancada{display:grid;grid-template-columns:210px 1fr;gap:10px;align-items:start}
+.bancada .bn{font-size:.86rem;font-weight:700;line-height:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bancada .bn span{color:var(--muted);font-weight:400}
+.dots{display:flex;flex-wrap:wrap;gap:3px}
+.dot{width:11px;height:11px;border-radius:2px;display:block}
+.dot:hover,.dot:focus-visible{outline:2px solid var(--ink);outline-offset:1px}
+.vkey{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:.9rem}
+.vkey span{display:inline-flex;align-items:center;gap:6px}
+details{border-top:1px solid var(--line);padding:10px 0}
+details summary{cursor:pointer;font-weight:700}
+.names{columns:3 220px;column-gap:24px;font-size:.92rem;padding-top:10px}
+.names li{break-inside:avoid;padding:1px 0}
+.vpill{display:inline-flex;align-items:center;gap:7px;font-weight:700;white-space:nowrap}
+
+/* projeto */
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:4px}
+.steps li{display:flex;flex-direction:column;gap:8px;font-size:.92rem;color:var(--muted)}
+.steps li::before{content:"";height:8px;border-radius:2px;background:var(--line)}
+.steps li.done{color:var(--ink);font-weight:700}
+.steps li.done::before{background:var(--lei)}
+.steps li.now{color:var(--ink);font-weight:700}
+.steps li.now::before{background:var(--and)}
+.steps li.now.par::before{background:var(--par)}
+.steps li.now.ape::before{background:var(--ape)}
+.steps li.stop::before{background:var(--enc)}
+.two{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px 36px}
+.kv{display:flex;flex-direction:column;gap:6px}
+.kv h3{padding-bottom:6px;border-bottom:2px solid var(--ink)}
+.kv dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:4px 14px}
+.kv dt{color:var(--muted)}
+.kv dd{margin:0}
+.note{border-left:4px solid var(--line);padding:4px 0 4px 16px;color:var(--muted);max-width:68ch}
+.tags{display:flex;flex-wrap:wrap;gap:8px}
+.tags a{border:1px solid var(--line);border-radius:999px;padding:3px 12px;text-decoration:none;color:var(--ink)}
+.tags a:hover{border-color:var(--ink)}
+
+/* tabelas */
+.tablewrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;min-width:560px}
+th,td{text-align:left;padding:10px 12px 10px 0;border-bottom:1px solid var(--line);vertical-align:baseline}
+th{font-size:.9rem;color:var(--muted);font-weight:500;border-bottom:2px solid var(--ink);white-space:nowrap}
+th button{background:none;border:0;padding:0;cursor:pointer;color:inherit;font-weight:inherit;text-decoration:underline;text-underline-offset:3px}
+th[aria-sort] button{color:var(--ink);font-weight:700}
+td.num,th.num{text-align:right;padding-right:18px}
+td .trilho.mini{min-width:140px}
+
+.resumo{display:flex;flex-direction:column;gap:14px;padding:20px 22px;background:var(--surface);border-radius:10px;max-width:760px}
+.resumo .manchete{font-size:1.2rem;font-weight:800;line-height:1.3;text-wrap:balance}
+.resumo h3{font-size:.95rem;margin-bottom:4px}
+.resumo ul{list-style:disc;padding-left:20px;display:flex;flex-direction:column;gap:4px}
+.resumo .fonte{font-size:.86rem;color:var(--muted)}
+.resumo.carregando .linha{height:14px;border-radius:4px;background:var(--line);max-width:90%}
+.resumo.carregando .linha:nth-child(2){max-width:70%}
+.resumo.carregando .linha:nth-child(3){max-width:80%}
+.sub-row{display:grid;grid-template-columns:minmax(200px,1.1fr) 2fr auto;gap:8px 22px;align-items:center;width:100%;background:none;border:0;padding:0;text-align:left;cursor:pointer;color:var(--ink)}
+.sub-row:hover .tn{text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:3px}
+.sub-row[aria-pressed="true"] .tn{color:var(--accent)}
+.sub-row[aria-pressed="true"] .tn::before{content:"";display:inline-block;width:4px;height:1em;background:var(--accent);margin-right:8px;vertical-align:-2px}
+.sub-row .tn{font-weight:700}
+.sub-row .tc{color:var(--muted);font-size:.92rem;text-align:right;white-space:nowrap}
+.proj-sum{display:block;font-weight:700;margin-bottom:2px}
+.hub-search{display:flex;flex-direction:column;gap:12px;padding:22px;background:var(--surface);border-radius:12px}
+.hub-search .big{font-size:1.15rem;min-height:52px;width:100%;padding:10px 14px}
+.hub-search label.vis{font-weight:700}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:14px}
+.pc{display:flex;flex-direction:column;gap:10px;padding:16px;border:1px solid var(--line);border-radius:10px;color:var(--ink);text-decoration:none;background:var(--card)}
+.pc:hover{border-color:var(--ink)}
+.pc:hover .pn{text-decoration:underline;text-underline-offset:3px}
+.pc-top{display:flex;gap:12px;align-items:center}
+.av{flex:none;width:44px;height:44px;border-radius:50%;background:var(--surface);border:1px solid var(--line);display:grid;place-items:center;font-weight:800;font-size:.95rem;color:var(--muted)}
+.av.lg{width:76px;height:76px;font-size:1.6rem}
+.pn{font-weight:800;line-height:1.25}
+.pm{font-size:.9rem;color:var(--muted)}
+.pc-feito{font-size:.95rem;line-height:1.45}
+.pc-feito b{font-weight:800}
+.pc-foot{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:.86rem;color:var(--muted)}
+.dest{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:22px 32px}
+.dest h3{padding-bottom:8px;border-bottom:2px solid var(--ink);margin-bottom:4px}
+.dest ol{counter-reset:d}
+.dest li{display:grid;grid-template-columns:22px 1fr auto;gap:10px;padding:8px 0;border-bottom:1px solid var(--line);align-items:baseline;counter-increment:d}
+.dest li::before{content:counter(d);color:var(--muted);font-size:.9rem}
+.dest .dv{font-weight:800}
+.dest .dn a{font-weight:700;color:var(--ink);text-decoration:none}
+.dest .dn a:hover{text-decoration:underline}
+.dest .dn span{display:block;font-size:.86rem;color:var(--muted)}
+.prof-head{display:flex;gap:18px;align-items:center;flex-wrap:wrap}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.tile{background:var(--card);padding:16px 18px;display:flex;flex-direction:column;gap:2px}
+.tile .tv{font-size:2rem;font-weight:800;line-height:1.1;letter-spacing:-.02em}
+.tile .tl{font-size:.92rem;color:var(--muted)}
+.tile .tv i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:8px;vertical-align:middle}
+.tbars{display:flex;flex-direction:column;gap:8px;max-width:640px}
+.tbar{display:grid;grid-template-columns:190px 1fr 44px;gap:12px;align-items:center;color:var(--ink);text-decoration:none}
+.tbar:hover .tbl{text-decoration:underline}
+.tbar .tbt{height:12px;border-radius:3px;background:var(--surface);overflow:hidden}
+.tbar .tbt i{display:block;height:100%;background:var(--accent)}
+.tbar .tbn{text-align:right;font-weight:700}
+.sec-head{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:8px 20px}
+@media (max-width:720px){.tbar{grid-template-columns:1fr 44px}.tbar .tbt{grid-column:1/-1;grid-row:2}.tile .tv{font-size:1.6rem}}
+.hero-h{font-size:clamp(1.8rem,4vw,2.8rem);font-weight:800;letter-spacing:-.025em;max-width:24ch}
+.mapa{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(320px,1fr);gap:28px;align-items:start}
+.mapa-svg{position:relative}
+.mapa-svg svg{display:block;width:100%;height:auto;max-height:78vh}
+.mapa-svg svg{overflow:visible}
+.uf{cursor:pointer;transform-box:fill-box;transform-origin:50% 60%;transition:transform .22s cubic-bezier(.2,.8,.3,1.2),filter .25s}
+.uf .top{fill:var(--rc);stroke:#fbf8f2;stroke-width:1.1;stroke-linejoin:round;transition:fill .15s}
+.uf .side{fill:var(--rs)}
+.uf:focus{outline:none}
+.uf:hover,.uf:focus-visible,.uf.hl{transform:translateY(-14px) scale(var(--sc,1.12));filter:drop-shadow(0 16px 10px rgba(70,52,30,.32))}
+#ufs .top{transition:fill .15s,opacity .2s}
+#ufs:has(.uf.hl) .uf:not(.hl):not(.sel),#ufs:has(.uf:hover) .uf:not(:hover):not(.sel){filter:saturate(.4) brightness(1.05)}
+.uf:hover .top,.uf:focus-visible .top,.uf.hl .top{fill:var(--rh);stroke:#fffdf8;stroke-width:1.6}
+.uf:focus-visible .top{stroke:var(--ink);stroke-width:1.6}
+.uf.sel{transform:translateY(-6px) scale(1.05);filter:drop-shadow(0 8px 6px rgba(30,40,50,.3))}
+.uf.sel .top{fill:var(--accent)}
+.uf.sel .side{fill:#1c3542}
+.uf.sel:hover,.uf.sel.hl{transform:translateY(-14px) scale(var(--sc,1.12))}
+.uf-lab{font:700 10.5px var(--font);fill:var(--ink);pointer-events:none;text-anchor:middle;dominant-baseline:central;opacity:.7}
+.uf.sel .uf-lab{fill:#fbf8f2;opacity:1}
+.uf:hover .uf-lab,.uf.hl .uf-lab{opacity:1}
+.mapa-regioes{display:flex;flex-wrap:wrap;gap:4px 16px;font-size:.86rem;color:var(--muted);margin-top:6px}
+.mapa-regioes span{display:inline-flex;align-items:center;gap:6px}
+.mapa-regioes i{width:12px;height:12px;border-radius:3px;display:inline-block}
+@media (prefers-reduced-motion:reduce){.uf{transition:none}}
+.uf-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.uf-chips button{min-width:44px;min-height:36px;border:1px solid var(--line);background:var(--card);border-radius:6px;cursor:pointer;font-weight:700;font-size:.88rem}
+.uf-chips button:hover{border-color:var(--ink)}
+.uf-chips button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fbf8f2}
+.painel-uf{position:sticky;top:84px;display:flex;flex-direction:column;gap:16px;padding:22px;background:var(--card);border:1px solid var(--line);border-radius:12px;min-height:420px}
+.painel-uf h2{font-size:1.6rem}
+.painel-uf .pu-sub{color:var(--muted);margin-top:4px}
+.pu-nums{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.pu-nums div{display:flex;flex-direction:column}
+.pu-nums b{font-size:1.6rem;font-weight:800;line-height:1.1}
+.pu-nums span{font-size:.86rem;color:var(--muted);line-height:1.3}
+.pu-sec h3{font-size:.95rem;padding-bottom:6px;border-bottom:1px solid var(--line);margin-bottom:6px}
+.pu-list li{display:grid;grid-template-columns:1fr;gap:2px;padding:7px 0;border-bottom:1px solid var(--line);align-items:baseline}
+.pu-list li:last-child{border-bottom:0}
+.pu-list a{color:var(--ink);font-weight:700;text-decoration:none}
+.pu-list a:hover{text-decoration:underline;text-underline-offset:3px}
+.pu-list .m{font-size:.86rem;color:var(--muted)}
+.pu-list .v{font-size:.9rem}
+.pu-props li{padding:8px 0;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:2px}
+.pu-props li:last-child{border-bottom:0}
+.pu-props a{color:var(--ink);text-decoration:none;line-height:1.35}
+.pu-props a:hover .t{text-decoration:underline;text-underline-offset:3px}
+.pu-props .t{font-weight:600}
+.pu-props .m{font-size:.86rem;color:var(--muted)}
+.pu-hint{color:var(--muted)}
+.rank{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:24px 36px}
+.rank h3{padding-bottom:8px;border-bottom:2px solid var(--ink);margin-bottom:2px}
+.rank ol{counter-reset:r}
+.rank li{display:grid;grid-template-columns:26px 1fr auto;gap:10px;padding:9px 0;border-bottom:1px solid var(--line);align-items:baseline;counter-increment:r}
+.rank li::before{content:counter(r);color:var(--muted);font-size:.9rem;font-weight:700}
+.rank .rn a{font-weight:700;color:var(--ink);text-decoration:none}
+.rank .rn a:hover{text-decoration:underline;text-underline-offset:3px}
+.rank .rn span{display:block;font-size:.86rem;color:var(--muted)}
+.rank .rv{text-align:right;font-weight:800;white-space:nowrap}
+.rank .rv span{display:block;font-weight:400;font-size:.84rem;color:var(--muted)}
+@media (max-width:860px){.mapa{grid-template-columns:1fr}.painel-uf{position:static;min-height:0}}
+.foot-legal{display:flex;flex-wrap:wrap;gap:6px 18px}
+mark.pend{background:#f3d98a;color:#2b2620;padding:0 3px;border-radius:2px}
+.legal-nav{margin-top:18px;padding-top:12px;border-top:1px solid var(--line)}
+.prose{display:flex;flex-direction:column;gap:14px;max-width:68ch}
+.prose h2{margin-top:18px}
+.prose ul{list-style:disc;padding-left:22px;display:flex;flex-direction:column;gap:6px}
+footer{border-top:1px solid var(--line);padding:22px 0 40px;color:var(--muted);font-size:.9rem}
+footer .wrap{display:flex;flex-direction:column;gap:6px}
+
+@media (max-width:720px){
+  body{font-size:16px}
+  .top{position:static}
+  .top .wrap{gap:8px 12px}
+  .nav{order:3;flex:1 0 100%;flex-wrap:nowrap;overflow-x:auto;white-space:nowrap;gap:18px;scrollbar-width:none;margin:0 -20px;padding:0 20px}
+  .nav::-webkit-scrollbar{display:none}
+  .tema-row{grid-template-columns:1fr auto}
+  .tema-row .trilho,.sub-row .trilho{grid-column:1/-1;grid-row:2}
+  .sub-row{grid-template-columns:1fr auto}
+  .proj-main{grid-template-columns:1fr}
+  .proj-meta{padding-left:0}
+  .vote-row{grid-template-columns:1fr}
+  .bancada{grid-template-columns:1fr;gap:4px}
+  .steps{grid-template-columns:1fr 1fr;gap:12px 6px}
+  .search{width:100%}
+  .search input{flex:1;width:auto;max-width:none}
+}
+@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+</style>
+</head>
+<body>
+<a class="skip" href="#conteudo">Pular para o conteúdo</a>
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="#inicio">
+      <span class="mark" aria-hidden="true"><i class="b-lei" style="width:8%"></i><i class="b-apr" style="width:12%"></i><i class="b-and" style="width:28%"></i><i class="b-par" style="width:34%"></i><i class="b-enc" style="width:18%"></i></span>
+      O que eles fizeram por você
+    </a>
+    <nav class="nav" aria-label="Seções">
+      <a href="#inicio" data-nav="inicio">Mapa</a>
+      <a href="#parlamentares" data-nav="parlamentares">Parlamentares</a>
+      <a href="#assuntos" data-nav="assuntos">Assuntos</a>
+      <a href="#votacoes" data-nav="votacoes">Votações</a>
+      <a href="#partidos" data-nav="partidos">Partidos</a>
+    </nav>
+    <form class="search" id="busca-form" role="search">
+      <label class="skip" for="busca-q">Buscar parlamentar ou assunto</label>
+      <input type="search" id="busca-q" placeholder="Nome ou assunto" autocomplete="off">
+      <button class="btn" type="submit">Buscar</button>
+    </form>
+  </div>
+</header>
+<main id="conteudo"><div class="wrap" id="view"><p class="muted">Carregando os dados…</p></div></main>
+<footer><div class="wrap">
+  <span id="foot-ref">Fonte: Dados Abertos da Câmara dos Deputados e do Senado Federal.</span>
+  <span><a href="#como-funciona">Como funciona e de onde vêm os dados</a></span>
+  <nav class="foot-legal" aria-label="Páginas legais"><a href="#privacidade">Política de Privacidade</a> <a href="#termos">Termos de Uso</a> <a href="#cookies">Política de Cookies</a> <a href="#contato">Contato</a></nav>
+  <span>Mapa: <a href="https://github.com/VictorCazanave/svg-maps" target="_blank" rel="noopener">SVG Maps</a>, de Victor Cazanave, licença CC BY 4.0.</span>
+  <span>Este é um protótipo. A classificação é automática e pode ter erros: confira sempre a página oficial de cada projeto.</span>
+</div></footer>
+
+<script>
+"use strict";
+const SIG=['PL','PLP','PEC'];
+const SIGN=['Projeto de lei','Projeto de lei complementar','Proposta de emenda à Constituição'];
+const BK=[
+ {k:'lei',nome:'Virou lei',desc:'Aprovado nas duas Casas e sancionado ou promulgado.'},
+ {k:'apr',nome:'Passou em uma Casa',desc:'Aprovado na Casa onde começou. Espera a outra Casa ou a sanção.'},
+ {k:'and',nome:'Em andamento',desc:'Teve movimentação nos últimos 6 meses.'},
+ {k:'par',nome:'Parado',desc:'Sem movimentação há mais de 6 meses.'},
+ {k:'ape',nome:'Anexado a outro',desc:'Tramita junto com um projeto parecido e depende dele para andar.'},
+ {k:'enc',nome:'Encerrado',desc:'Arquivado, retirado pelo autor ou rejeitado.'}];
+const TEMAS={saude:'Saúde',educacao:'Educação',seguranca:'Segurança',economia:'Economia e trabalho',direitos:'Direitos e assistência social',ambiente:'Meio ambiente e energia',cidades:'Cidades e transporte',politica:'Política e serviço público',outros:'Cultura, esporte, tecnologia e outros'};
+const VOTO=['Sem voto registrado','Sim','Não','Abstenção','Obstrução','Presidiu a sessão','Presente, não votou','Ausência justificada','Não compareceu'];
+const CASA=['Câmara','Senado'];
+const SEATS=[513,81];
+const F={sig:0,num:1,ano:2,ori:3,cd:4,sf:5,em:6,tm:7,au:8,na:9,da:10,b:11,cs:12,cdt:13,co:14,ss:15,sdt:16,ap:17,leg:18,sub:19};
+const P={id:0,casa:1,nome:2,pt:3,uf:4,st:5,ativo:11,tm:12,ex:13,pr:14,sx:15};
+/* Mesmo critério dos totais do site: apresentado por parlamentar desde fev/2023, na Casa dele. */
+function isLeg(r){const a=r[F.au][0];return r[F.leg]===1&&typeof a==='number'&&CORE.parl[a][P.casa]===r[F.ori];}
+function cargo(p){const f=p[P.sx]==='F',u=p[P.sx]==='';if(p[P.casa])return u?'Mandato no Senado':'Senador'+(f?'a':'');return u?'Mandato na Câmara':'Deputad'+(f?'a':'o')+' federal';}
+const UFN={AC:'Acre',AL:'Alagoas',AP:'Amapá',AM:'Amazonas',BA:'Bahia',CE:'Ceará',DF:'Distrito Federal',ES:'Espírito Santo',GO:'Goiás',MA:'Maranhão',MT:'Mato Grosso',MS:'Mato Grosso do Sul',MG:'Minas Gerais',PA:'Pará',PB:'Paraíba',PR:'Paraná',PE:'Pernambuco',PI:'Piauí',RJ:'Rio de Janeiro',RN:'Rio Grande do Norte',RS:'Rio Grande do Sul',RO:'Rondônia',RR:'Roraima',SC:'Santa Catarina',SP:'São Paulo',SE:'Sergipe',TO:'Tocantins'};
+const TEMAC={saude:'Saúde',educacao:'Educação',seguranca:'Segurança',economia:'Economia e trabalho',direitos:'Direitos sociais',ambiente:'Meio ambiente',cidades:'Cidades e transporte',politica:'Política e Estado',outros:'Cultura, esporte e outros'};
+
+let CORE=null, PROPS=null, propsPromise=null, REFD=null;
+let HL=[[],[]], PIDX={}, RIDX=null, VBYROW=null, TKEYS=[];
+const S={uf:'',casa:'all',q:'',list:null,parl:{q:'',casa:'',uf:'',pt:'',sort:'lei',page:1,todos:false},vot:{casa:'',ano:''},lastView:''};
+
+const view=document.getElementById('view');
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const nf=n=>Number(n).toLocaleString('pt-BR');
+const norm=s=>String(s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase();
+const slug=s=>norm(s).replace(/[^a-z0-9]/g,'');
+const fdate=d=>d?`${String(d%100).padStart(2,'0')}/${String(Math.floor(d/100)%100).padStart(2,'0')}/${Math.floor(d/10000)}`:'data não informada';
+const toDate=d=>new Date(Math.floor(d/10000),Math.floor(d/100)%100-1,d%100);
+function ago(d){
+  if(!d)return '';
+  const a=toDate(d);let m=(REFD.getFullYear()-a.getFullYear())*12+REFD.getMonth()-a.getMonth();
+  if(REFD.getDate()<a.getDate())m--;
+  if(m<1){const days=Math.max(0,Math.round((REFD-a)/864e5));return days<=1?'1 dia':`${days} dias`;}
+  const y=Math.floor(m/12),r=m%12;
+  const ys=y?`${y} ${y>1?'anos':'ano'}`:'',ms=r?`${r} ${r>1?'meses':'mês'}`:'';
+  return ys&&ms?`${ys} e ${ms}`:ys||ms;
+}
+const sum=a=>a.reduce((x,y)=>x+y,0);
+const add=(a,b)=>a.map((x,i)=>x+b[i]);
+
+/* ---------- carga ---------- */
+async function loadCore(){
+  const r=await fetch('data/core.json');if(!r.ok)throw new Error('core');
+  CORE=await r.json();
+  REFD=new Date(CORE.ref+'T12:00:00');
+  TKEYS=CORE.temas;
+  CORE.parl.forEach((p,i)=>{HL[p[P.casa]].push(i);PIDX[(p[P.casa]?'s':'d')+p[P.id]]=i;});
+  VBYROW={};CORE.votes.forEach((v,i)=>{(VBYROW[v.row]=VBYROW[v.row]||[]).push(i);});
+  document.getElementById('foot-ref').textContent=`Fonte: Dados Abertos da Câmara dos Deputados e do Senado Federal, coletados em ${fdate(+CORE.ref.replace(/-/g,''))}.`;
+}
+function loadProps(){
+  if(!propsPromise){
+    const resumos=fetch('data/resumos.json').then(r=>r.ok?r.json():{}).catch(()=>({})).then(j=>{Object.keys(j||{}).forEach(k=>{const x=cleanResumo(j[k]);if(x){x.rev=j[k].rev||'';RES[k]=x;}});});
+    propsPromise=fetch('data/props.json').then(r=>{if(!r.ok)throw new Error('props');return r.json();}).then(async d=>{
+      await resumos;
+      PROPS=d;RIDX={};d.rows.forEach((r,i)=>{RIDX[r[F.cd]?'c'+r[F.cd]:'s'+r[F.sf]]=i;});return d;});
+  }
+  return propsPromise;
+}
+const rid=r=>r[F.cd]?'c'+r[F.cd]:'s'+r[F.sf];
+const rname=r=>`${SIG[r[F.sig]]} ${r[F.num]}/${r[F.ano]}`;
+const lastMov=r=>Math.max(r[F.cdt]||0,r[F.sdt]||0);
+const phref=i=>{const p=CORE.parl[i];return `#${p[P.casa]?'s':'d'}-${p[P.id]}`;};
+
+/* ---------- componentes ---------- */
+function trilho(c,mini){
+  const t=sum(c);if(!t)return `<div class="trilho${mini?' mini':''}" role="img" aria-label="Sem projetos"></div>`;
+  const lab=BK.map((b,i)=>`${b.nome}: ${nf(c[i])}`).join('; ');
+  return `<div class="trilho${mini?' mini':''}" role="img" aria-label="${esc(lab)}">${BK.map((b,i)=>c[i]?`<i class="b-${b.k}" style="flex:${c[i]} 0 0" title="${esc(b.nome)}: ${nf(c[i])}"></i>`:'').join('')}</div>`;
+}
+function legend(c){
+  const t=sum(c)||1;
+  return `<ul class="legend">${BK.map((b,i)=>`<li><i class="sw b-${b.k}"></i><span><span class="n">${nf(c[i])}</span> <b>${b.nome}</b> <span class="muted">${(c[i]/t*100).toLocaleString('pt-BR',{maximumFractionDigits:1})}%</span></span><p>${b.desc}</p></li>`).join('')}</ul>`;
+}
+function stTag(r){
+  const b=BK[r[F.b]];let txt=b.nome;
+  if(b.k==='par'){const a=ago(lastMov(r));if(a)txt=`Parado há ${a}`;}
+  return `<span class="st"><i class="sw b-${b.k}"></i>${txt}</span>`;
+}
+function author(a,link=true){
+  if(typeof a==='number'){const p=CORE.parl[a];const n=link?`<a href="${phref(a)}">${esc(p[P.nome])}</a>`:esc(p[P.nome]);return `${n} (${esc(p[P.pt]||'sem partido')}${p[P.uf]?'-'+esc(p[P.uf]):''})`;}
+  return esc(a[0])+(a[1]?` (${esc(a[1])}${a[2]?'-'+esc(a[2]):''})`:'');
+}
+function authors(r,link=true){
+  const au=r[F.au];if(!au.length)return 'Autoria não informada';
+  const extra=r[F.na]-1;
+  return author(au[0],link)+(extra>0?` e mais ${nf(extra)}`:'');
+}
+function projItem(i){
+  const r=PROPS.rows[i];const sm=RES[rid(r)];const title=(sm?`<span class="proj-sum">${esc(sm.manchete)}</span>`:'')+(r[F.ap]?`<b>${esc(r[F.ap])}.</b> ${esc(r[F.em])}`:esc(r[F.em]));
+  const mov=lastMov(r);
+  return `<li class="proj"><a class="proj-main" href="#p-${rid(r)}"><span class="proj-id">${rname(r)}</span><span class="proj-title">${title}</span></a>
+  <div class="proj-meta">${stTag(r)}<span>${authors(r)}</span>${BK[r[F.b]].k!=='par'&&mov?`<span>Última movimentação em ${fdate(mov)}</span>`:''}</div></li>`;
+}
+function tally(v){const c=[0,0,0,0,0,0,0,0,0];for(let i=0;i<v.v.length;i++)c[v.v.charCodeAt(i)-48]++;return c;}
+function placar(v){
+  const c=tally(v),voted=c[1]+c[2]+c[3]+c[4],tot=SEATS[v.casa];
+  const seg=[[1,c[1]],[2,c[2]],[3,c[3]+c[4]]].filter(x=>x[1]).map(x=>`<i class="v${x[0]}" style="flex:${x[1]} 0 0"></i>`).join('');
+  const rest=Math.max(0,tot-voted);
+  return `<div class="placar"><div class="pbar" role="img" aria-label="Sim ${c[1]}, Não ${c[2]}">${seg}${rest?`<i class="v0" style="flex:${rest} 0 0"></i>`:''}</div><span><b>${c[1]}</b> sim, <b>${c[2]}</b> não${c[3]?`, ${c[3]} abstenç${c[3]>1?'ões':'ão'}`:''}${c[4]?`, ${c[4]} em obstrução`:''}</span></div>`;
+}
+const resTxt=v=>v.res?'Aprovado':'Rejeitado';
+function quorumNota(v){const c=tally(v);return !v.res&&c[1]>c[2]?' Teve mais votos sim, mas não alcançou o mínimo exigido. Lei complementar e PEC precisam de maioria absoluta ou de três quintos da Casa, não só da maioria dos presentes.':'';}
+function votaram(v){const c=tally(v),n=c[1]+c[2]+c[3]+c[4];return `${n} de ${SEATS[v.casa]} ${v.casa?'senadores':'deputados'} registraram voto.`;}
+function voteRow(vi,withProj){
+  const v=CORE.votes[vi];const r=PROPS?PROPS.rows[v.row]:null;
+  const head=r?`<b>${rname(r)}</b> ${esc(r[F.ap]||r[F.em])}`:esc(v.desc);
+  return `<li><a class="vote-row" href="${r?'#p-'+rid(r):'#votacoes'}"><span class="vd">${fdate(v.data)}<br>${CASA[v.casa]}</span><span class="vt">${head}<br><span class="vd"><span class="res">${resTxt(v)}.</span>${quorumNota(v)} ${esc(v.desc)}</span></span>${placar(v)}</a></li>`;
+}
+function painel(v){
+  const list=HL[v.casa],groups={};
+  for(let i=0;i<v.v.length;i++){const c=v.v.charCodeAt(i)-48;if(!c)continue;const pi=list[i],p=CORE.parl[pi];(groups[p[P.pt]||'Sem partido']=groups[p[P.pt]||'Sem partido']||[]).push([c,pi]);}
+  const parties=Object.keys(groups).sort((a,b)=>groups[b].length-groups[a].length||a.localeCompare(b));
+  const rows=parties.map(pt=>{const g=groups[pt].sort((a,b)=>a[0]-b[0]||CORE.parl[a[1]][P.nome].localeCompare(CORE.parl[b[1]][P.nome]));
+    const s=g.filter(x=>x[0]===1).length,n=g.filter(x=>x[0]===2).length;
+    return `<div class="bancada"><span class="bn" title="${esc(pt)}: ${s} sim, ${n} não">${esc(pt)} <span>${s} sim, ${n} não</span></span><span class="dots">${g.map(([c,pi])=>{const p=CORE.parl[pi];return `<a class="dot v${c}" href="${phref(pi)}" title="${esc(p[P.nome])} (${esc(p[P.pt])}-${esc(p[P.uf])}): ${VOTO[c]}" aria-label="${esc(p[P.nome])}, ${esc(p[P.pt])}, ${VOTO[c]}"></a>`;}).join('')}</span></div>`;}).join('');
+  const c=tally(v);
+  const key=[[1,'Sim'],[2,'Não'],[3,'Abstenção'],[4,'Obstrução'],[5,'Presidiu a sessão'],[6,'Ausente ou sem voto']].filter(([k])=>k<6?c[k]:(c[6]+c[7]+c[8])).map(([k,l])=>`<span><i class="sw v${k}"></i>${l}</span>`).join('');
+  const byVote=[1,2,3,4,6,7,8].filter(k=>c[k]).map(k=>{const names=[];for(let i=0;i<v.v.length;i++)if(v.v.charCodeAt(i)-48===k)names.push(list[i]);
+    return `<details><summary>${VOTO[k]} (${names.length})</summary><ul class="names">${names.map(pi=>`<li>${author(pi)}</li>`).join('')}</ul></details>`;}).join('');
+  return `<div class="vkey">${key}</div><div class="painel">${rows}</div><p class="small muted">Cada quadrado é um parlamentar, agrupado por partido. Passe o mouse ou toque para ver o nome.</p>${byVote}`;
+}
+
+/* ---------- lista de projetos com filtros ---------- */
+function startList(base,opts={}){
+  S.list={base,bk:new Set(),ori:'',q:opts.q||'',sort:opts.sort||'mov',page:1,hideOri:!!opts.hideOri,legToggle:!!opts.legToggle,leg:!!opts.legToggle};
+  return `<div class="block"><div class="filters" id="lf"></div><p class="small muted" id="lcount"></p><ul class="rows" id="lrows"></ul><button class="btn ghost more" id="lmore" data-act="more">Mostrar mais</button></div>`;
+}
+function drawList(){
+  const L=S.list;if(!L||!PROPS)return;
+  const rows=PROPS.rows,q=norm(L.q).trim();
+  let pre=L.base.filter(i=>{const r=rows[i];
+    if(L.ori!==''&&r[F.ori]!==+L.ori)return false;
+    if(L.leg&&!isLeg(r))return false;
+    if(q){const a0=r[F.au][0];const an=typeof a0==='number'?CORE.parl[a0][P.nome]:(a0?a0[0]:'');
+      if(!norm(rname(r)+' '+r[F.em]+' '+r[F.ap]+' '+an).includes(q))return false;}
+    return true;});
+  const counts=[0,0,0,0,0,0];pre.forEach(i=>counts[rows[i][F.b]]++);
+  let idx=L.bk.size?pre.filter(i=>L.bk.has(rows[i][F.b])):pre;
+  const key={mov:(a,b)=>lastMov(rows[b])-lastMov(rows[a]),velho:(a,b)=>(lastMov(rows[a])||99999999)-(lastMov(rows[b])||99999999),novo:(a,b)=>rows[b][F.da]-rows[a][F.da]}[L.sort];
+  idx=idx.slice().sort(key);
+  const lf=document.getElementById('lf');
+  if(lf&&!lf.dataset.ready){
+    lf.innerHTML=`<span id="lchips" class="filters"></span>
+      ${L.hideOri?'':`<label class="skip" for="lori">Quem propôs</label><select id="lori"><option value="">Qualquer autor</option><option value="0">Propostos por deputados</option><option value="1">Propostos por senadores</option><option value="2">Governo, Judiciário e outros</option></select>`}
+      <label class="skip" for="lsort">Ordem</label><select id="lsort"><option value="mov">Movimentação mais recente</option><option value="velho">Parados há mais tempo</option><option value="novo">Apresentados por último</option></select>
+      <label class="skip" for="lq">Filtrar por palavra</label><input type="search" id="lq" placeholder="Filtrar por palavra" value="${esc(L.q)}">
+      ${L.legToggle?`<label class="chip" for="lleg" style="cursor:pointer"><input type="checkbox" id="lleg"${L.leg?'':' checked'}> Incluir projetos do governo, de comissões e anteriores a 2023</label>`:''}`;
+    lf.dataset.ready='1';
+    const so=document.getElementById('lsort');so.value=L.sort;
+  }
+  document.getElementById('lchips').innerHTML=BK.map((b,i)=>`<button class="chip" data-act="bk" data-b="${i}" aria-pressed="${L.bk.has(i)}"><i class="sw b-${b.k}"></i>${b.nome} <span class="c">${nf(counts[i])}</span></button>`).join('');
+  const shown=idx.slice(0,L.page*30);
+  document.getElementById('lcount').textContent=idx.length?`${nf(idx.length)} projeto${idx.length>1?'s':''}. Mostrando ${nf(shown.length)}.`:'';
+  document.getElementById('lrows').innerHTML=shown.length?shown.map(projItem).join(''):`<li class="empty">Nenhum projeto com esses filtros. Tire um filtro ou mude a palavra.</li>`;
+  document.getElementById('lmore').hidden=shown.length>=idx.length;
+}
+
+/* ---------- resumo em linguagem simples ---------- */
+const RES={};            // cache da sessão: rid -> resumo
+function cleanResumo(x){
+  // dados compartilhados não são confiáveis: valida forma e tamanho antes de usar
+  if(!x||typeof x!=='object')return null;
+  const str=(v,n)=>typeof v==='string'?v.replace(/\s+/g,' ').trim().slice(0,n):'';
+  const m=str(x.manchete,160);if(!m)return null;
+  const muda=(Array.isArray(x.o_que_muda)?x.o_que_muda:[]).map(v=>str(v,260)).filter(Boolean).slice(0,4);
+  return {manchete:m,o_que_muda:muda,quem_e_afetado:str(x.quem_e_afetado,260),atencao:str(x.atencao,260)};
+}
+function resumoHTML(x){
+  return `<div class="resumo"><p class="manchete">${esc(x.manchete)}</p>
+    ${x.o_que_muda.length?`<div><h3>O que muda</h3><ul>${x.o_que_muda.map(t=>`<li>${esc(t)}</li>`).join('')}</ul></div>`:''}
+    ${x.quem_e_afetado?`<div><h3>Quem é afetado</h3><p>${esc(x.quem_e_afetado)}</p></div>`:''}
+    ${x.atencao?`<div><h3>Atenção</h3><p>${esc(x.atencao)}</p></div>`:''}
+    <p class="fonte">Resumo escrito com apoio de IA a partir da ementa oficial e revisado por uma pessoa em ${x.rev?fdate(x.rev):'data não informada'}. Confira sempre o texto oficial.</p></div>`;
+}
+/* Resumos revisados por uma pessoa, gravados em data/resumos.json. Nada é gerado no navegador. */
+function showResumo(i,viewKey){
+  const box=document.getElementById('resumo');if(!box)return;
+  const r=PROPS.rows[i],x=RES[rid(r)];
+  if(x)box.innerHTML=resumoHTML(x);
+}
+
+/* ---------- telas ---------- */
+function aggFor(casa){
+  const a=CORE.agg;if(casa==='cd')return a.cd;if(casa==='sf')return a.sf;
+  const temas={};TKEYS.forEach(t=>temas[t]=add(a.cd.temas[t],a.sf.temas[t]));return {tot:add(a.cd.tot,a.sf.tot),temas};
+}
+let MAP=null,mapPromise=null,STATE_ROWS=null;
+function loadMap(){if(!mapPromise)mapPromise=fetch('data/map.json').then(r=>{if(!r.ok)throw new Error('map');return r.json();}).then(d=>MAP=d);return mapPromise;}
+// em exercício: aparece em alguma das 8 votações nominais mais recentes da sua Casa
+function isCurrent(pi){return !!CORE.parl[pi][P.ex];}
+function stateRows(){
+  if(STATE_ROWS||!PROPS)return STATE_ROWS;
+  STATE_ROWS={};
+  PROPS.rows.forEach((r,i)=>{const a0=r[F.au][0];if(typeof a0!=='number')return;const k=BK[r[F.b]].k;if(k!=='lei'&&k!=='apr')return;
+    const uf=CORE.parl[a0][P.uf];if(!uf)return;(STATE_ROWS[uf]=STATE_ROWS[uf]||[]).push(i);});
+  for(const uf in STATE_ROWS)STATE_ROWS[uf].sort((x,y)=>(PROPS.rows[x][F.b]-PROPS.rows[y][F.b])||(lastMov(PROPS.rows[y])-lastMov(PROPS.rows[x])));
+  return STATE_ROWS;
+}
+const aprov=s=>s.lei+s.apr;
+function ptLine(pi){const p=CORE.parl[pi];return `${esc(p[P.pt]||'sem partido')}${p[P.uf]?' · '+esc(p[P.uf]):''}`;}
+function painelBrasil(){
+  const g=aggFor('all');
+  return `<div><h2>Brasil</h2><p class="pu-sub">Câmara dos Deputados e Senado Federal, desde fevereiro de 2023</p></div>
+  <div class="pu-nums"><div><b>${nf(sum(g.tot))}</b><span>projetos apresentados</span></div><div><b>${nf(g.tot[1])}</b><span>aprovados em uma Casa</span></div><div><b>${nf(g.tot[0])}</b><span>viraram lei</span></div></div>
+  ${trilho(g.tot)}
+  <ul class="legend mini">${BK.map((b,i)=>`<li><i class="sw b-${b.k}"></i><span><span class="n">${nf(g.tot[i])}</span> ${b.nome}</span></li>`).join('')}</ul>
+  <p class="pu-hint">Passe o mouse sobre um estado, ou toque nele, para ver quem o representa e o que essas pessoas aprovaram.</p>`;
+}
+function painelUF(uf){
+  const all=CORE.parl.map((p,i)=>i).filter(i=>CORE.parl[i][P.ativo]&&CORE.parl[i][P.uf]===uf);
+  const S2=pstats();
+  const dep=all.filter(i=>CORE.parl[i][P.casa]===0),sen=all.filter(i=>CORE.parl[i][P.casa]===1);
+  const depC=dep.filter(isCurrent),senC=sen.filter(isCurrent);
+  const tot=all.reduce((a,i)=>add(a,S2[i].st),[0,0,0,0,0,0]);
+  const byAp=(x,y)=>aprov(S2[y])-aprov(S2[x])||S2[y].lei-S2[x].lei||S2[y].n-S2[x].n;
+  const li=i=>{const s=S2[i];return `<li><span><a href="${phref(i)}">${esc(CORE.parl[i][P.nome])}</a><br><span class="m">${ptLine(i)}</span></span><span class="v">${s.lei?`<b>${s.lei}</b> ${s.lei>1?'leis':'lei'}`:''}${s.lei&&s.apr?' · ':''}${s.apr?`${s.apr} ${s.apr>1?'aprovados':'aprovado'} em uma Casa`:''}${!s.lei&&!s.apr?`<span class="m">${s.n} ${s.n===1?'projeto':'projetos'}, nenhum aprovado</span>`:''}</span></li>`;};
+  const sr=stateRows();
+  const props=sr?(sr[uf]||[]):null;
+  const propHTML=props==null?`<p class="muted small">Carregando as propostas…</p>`:props.length?`<ul class="pu-props">${props.slice(0,5).map(i=>{const r=PROPS.rows[i];const sm=RES[rid(r)];let t=sm?sm.manchete:(r[F.ap]||r[F.em]);if(t.length>130)t=t.slice(0,t.lastIndexOf(' ',127))+'…';
+      return `<li><a href="#p-${rid(r)}"><span class="st small"><i class="sw b-${BK[r[F.b]].k}"></i>${BK[r[F.b]].k==='lei'?'Virou lei':'Aprovado em uma Casa'}</span> <span class="t">${rname(r)}: ${esc(t)}</span></a><span class="m">${author(r[F.au][0],false)}</span></li>`;}).join('')}</ul>${props.length>5?`<p class="small muted">${nf(props.length)} propostas aprovadas no total. Veja todas nos perfis de cada parlamentar.</p>`:''}`:`<p class="muted small">Nenhuma proposta de parlamentares deste estado foi aprovada no período.</p>`;
+  return `<div><h2>${esc(UFN[uf])}</h2><p class="pu-sub">${depC.length} deputados federais e ${senC.length} senadores em exercício</p></div>
+  <div class="pu-nums"><div><b>${nf(sum(tot))}</b><span>projetos apresentados</span></div><div><b>${nf(tot[1])}</b><span>aprovados em uma Casa</span></div><div><b>${nf(tot[0])}</b><span>viraram lei</span></div></div>
+  <div class="pu-sec"><h3>Senadores</h3><ul class="pu-list">${senC.sort(byAp).map(li).join('')||'<li class="m">Sem dados de votação recentes.</li>'}</ul></div>
+  <div class="pu-sec"><h3>Deputados com mais propostas aprovadas</h3><ul class="pu-list">${depC.sort(byAp).slice(0,5).map(li).join('')}</ul>
+    <p class="small"><a href="#parlamentares" data-act="ufgo" data-uf="${uf}">Ver todos os ${depC.length} deputados de ${esc(UFN[uf])}</a></p></div>
+  <div class="pu-sec"><h3>Propostas aprovadas mais recentes</h3>${propHTML}</div>
+  <p class="small muted">Os números somam todos os parlamentares que representaram o estado desde 2023, inclusive suplentes e quem já deixou o cargo. Em exercício: lista oficial da Câmara e do Senado.</p>`;
+}
+function drawPainel(uf){
+  const el=document.getElementById('painel-uf');if(!el)return;
+  el.innerHTML=uf?painelUF(uf):painelBrasil();
+  document.querySelectorAll('.uf').forEach(p=>{const on=p.dataset.uf===S.uf;p.classList.toggle('sel',on);p.setAttribute('aria-pressed',on);p.classList.toggle('hl',p.dataset.uf===uf&&!on);});
+  document.querySelectorAll('.uf-chips button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.uf===S.uf));
+}
+function selectUF(uf){S.uf=S.uf===uf?'':uf;if(S.uf)liftUF(S.uf);drawPainel(S.uf);if(S.uf&&window.matchMedia('(max-width:860px)').matches)document.getElementById('painel-uf').scrollIntoView({behavior:'smooth',block:'start'});}
+const REG={N:['Norte','#cdd9bd','#9caf88','#dbe5cd'],NE:['Nordeste','#ecd8a6','#c6ad6f','#f3e4bf'],CO:['Centro-Oeste','#ebc6a6','#c59a76','#f2d6be'],SE:['Sudeste','#c7d4df','#93a6b7','#d8e2ea'],S:['Sul','#d5cae0','#a898ba','#e2d9ea']};
+const UFREG={AC:'N',AM:'N',AP:'N',PA:'N',RO:'N',RR:'N',TO:'N',AL:'NE',BA:'NE',CE:'NE',MA:'NE',PB:'NE',PE:'NE',PI:'NE',RN:'NE',SE:'NE',DF:'CO',GO:'CO',MS:'CO',MT:'CO',ES:'SE',MG:'SE',RJ:'SE',SP:'SE',PR:'S',RS:'S',SC:'S'};
+function mapSVG(){
+  if(!MAP)return '<p class="muted">Carregando o mapa…</p>';
+  const [x,y,w,h]=MAP.viewBox.split(' ').map(Number);
+  const depth=[2,4,6,8];
+  const states=MAP.locations.map(l=>{const u=l.id.toUpperCase(),r=REG[UFREG[u]];
+    return `<g class="uf" data-uf="${u}" tabindex="0" role="button" aria-label="${esc(UFN[u]||u)}" aria-pressed="false" style="--rc:${r[1]};--rs:${r[2]};--rh:${r[3]}"><title>${esc(UFN[u]||u)}</title>${depth.map(d=>`<path class="side" d="${l.path}" transform="translate(0 ${d})"/>`).join('')}<path class="top" d="${l.path}"/></g>`;}).join('');
+  return `<svg viewBox="${x-12} ${y-18} ${w+24} ${h+40}" role="group" aria-label="Mapa do Brasil por estado">
+    <defs><filter id="chao" x="-10%" y="-10%" width="120%" height="130%"><feGaussianBlur stdDeviation="9"/></filter></defs>
+    <g opacity=".22" filter="url(#chao)">${MAP.locations.map(l=>`<path d="${l.path}" transform="translate(6 16)" fill="#6b5236"/>`).join('')}</g>
+    <g id="ufs">${states}</g></svg>`;
+}
+function labelMap(){
+  const nudge={DF:[0,-1],RJ:[8,8],ES:[9,2],SE:[8,6],AL:[10,4],PE:[0,-2],PB:[10,0],RN:[8,-4],SC:[2,0],GO:[-6,6],MG:[4,4],PA:[0,6]};
+  document.querySelectorAll('.uf').forEach(g=>{const b=g.querySelector('.top').getBBox(),u=g.dataset.uf,n=nudge[u]||[0,0];
+    g.style.setProperty('--sc',Math.max(1.1,Math.min(1.5,1+11/Math.sqrt(b.width*b.height))).toFixed(3));
+    const t=document.createElementNS('http://www.w3.org/2000/svg','text');t.setAttribute('class','uf-lab');t.setAttribute('x',(b.x+b.width/2+n[0]).toFixed(1));t.setAttribute('y',(b.y+b.height/2+n[1]).toFixed(1));t.textContent=u;g.appendChild(t);});
+}
+function liftUF(u){const g=document.querySelector(`.uf[data-uf="${u}"]`);if(g&&g.parentNode.lastElementChild!==g)g.parentNode.appendChild(g);}
+function rankLi(i,val,sub){const p=CORE.parl[i];return `<li><span class="rn"><a href="${phref(i)}">${esc(p[P.nome])}</a><span>${ptLine(i)}${p[P.ex]?'':' · fora do mandato'}</span></span><span class="rv">${val}${sub?`<span>${sub}</span>`:''}</span></li>`;}
+function vInicio(){
+  const g=aggFor('all');const S2=pstats();
+  const act=CORE.parl.map((p,i)=>i).filter(i=>CORE.parl[i][P.ativo]);
+  const byAp=(x,y)=>aprov(S2[y])-aprov(S2[x])||S2[y].lei-S2[x].lei;
+  const topDep=act.filter(i=>CORE.parl[i][P.casa]===0&&aprov(S2[i])).sort(byAp).slice(0,10);
+  const topSen=act.filter(i=>CORE.parl[i][P.casa]===1&&aprov(S2[i])).sort(byAp).slice(0,10);
+  const presRank=c=>act.filter(i=>CORE.parl[i][P.ex]&&CORE.parl[i][P.casa]===c&&S2[i].pres!=null&&S2[i].presN>=(c?60:100)).sort((x,y)=>S2[y].pres-S2[x].pres||S2[y].presN-S2[x].presN||CORE.parl[x][P.nome].localeCompare(CORE.parl[y][P.nome])).slice(0,10);
+  const topPresD=presRank(0),topPresS=presRank(1);
+  const apSub=i=>`${S2[i].lei} ${S2[i].lei===1?'virou lei':'viraram lei'}`;
+  const lastVotes=CORE.votes.slice(0,4).map((v,i)=>i);
+  view.innerHTML=`<div class="stack">
+  <section class="block">
+    <h1 class="hero-h">Quem representa o seu estado, e o que conseguiu aprovar</h1>
+    <p class="lead">Deputados federais e senadores de cada estado, os projetos que eles propuseram e os que foram aprovados, com dados oficiais da Câmara e do Senado desde fevereiro de 2023.</p>
+    <div class="mapa">
+      <div><div class="mapa-svg" id="mapa">${mapSVG()}</div>
+        <p class="mapa-regioes">${Object.values(REG).map(r=>`<span><i style="background:${r[1]}"></i>${r[0]}</span>`).join('')}</p>
+        <div class="uf-chips" role="group" aria-label="Escolher estado pela sigla">${Object.keys(UFN).sort().map(u=>`<button data-act="ufsel" data-uf="${u}" aria-pressed="false" title="${esc(UFN[u])}">${u}</button>`).join('')}</div></div>
+      <aside class="painel-uf" id="painel-uf" aria-live="polite"></aside>
+    </div>
+  </section>
+  <section class="block" id="ranking">
+    <h2>Quem mais teve propostas aprovadas</h2>
+    <p class="muted" style="max-width:70ch">Conta projetos em que a pessoa é autora principal, apresentados desde fevereiro de 2023, que viraram lei ou foram aprovados em pelo menos uma Casa.</p>
+    <div class="rank">
+      <div><h3>Deputados federais</h3><ol>${topDep.map(i=>rankLi(i,`${aprov(S2[i])} aprovadas`,apSub(i))).join('')}</ol></div>
+      <div><h3>Senadores</h3><ol>${topSen.map(i=>rankLi(i,`${aprov(S2[i])} aprovadas`,apSub(i))).join('')}</ol></div>
+    </div>
+    <h2 style="margin-top:12px">Quem mais compareceu</h2>
+    <div class="rank">
+      <div><h3>Deputados: presença em plenário</h3>${(()=>{const n=act.filter(i=>CORE.parl[i][P.ex]&&CORE.parl[i][P.casa]===0&&S2[i].pres===1&&S2[i].presN>=100).length;return n>10?`<p class="small muted" style="margin:6px 0">${n} deputados estiveram em todas as sessões do período. Abaixo, os 10 primeiros em ordem alfabética.</p>`:''})()}<ol>${topPresD.map(i=>rankLi(i,pct(S2[i].pres),`${S2[i].presOk} de ${S2[i].presN} sessões`)).join('')}</ol></div>
+      <div><h3>Senadores: presença nos dias de votação</h3><ol>${topPresS.map(i=>rankLi(i,pct(S2[i].pres),`${S2[i].presOk} de ${S2[i].presN} dias`)).join('')}</ol></div>
+    </div>
+    <p class="note small">Quantidade não mede qualidade: um projeto pode ser simples, como dar nome a uma rodovia, ou mudar a vida de milhões de pessoas. Abra cada perfil para ver o que foi aprovado. As duas Casas medem presença de jeitos diferentes, por isso há uma lista para cada uma. Entram só parlamentares em exercício com pelo menos 100 sessões (Câmara) ou 60 dias de votação (Senado).</p>
+    <p><a href="#parlamentares">Ver todos os parlamentares</a></p>
+  </section>
+  <section class="block">
+    <h2>Por assunto</h2>
+    ${trilho(g.tot)}${legend(g.tot)}
+    <ul class="rows">${TKEYS.map(k=>{const c=g.temas[k];return `<li><a class="tema-row" href="#tema-${k}"><span class="tn">${TEMAS[k]}</span>${trilho(c,true)}<span class="tc">${nf(sum(c))} projetos, ${nf(c[0])} ${c[0]===1?'virou':'viraram'} lei</span></a></li>`;}).join('')}</ul>
+  </section>
+  <section class="block">
+    <h2>Últimas votações nominais</h2>
+    <ul class="rows" id="home-votes">${lastVotes.map(i=>voteRow(i)).join('')}</ul>
+    <a href="#votacoes">Ver todas as ${nf(CORE.votes.length)} votações</a>
+  </section></div>`;
+  const viewKey=S.lastView;
+  const wire=()=>{const svg=document.querySelector('#mapa svg');if(!svg)return;labelMap();
+    svg.addEventListener('mouseover',e=>{const p=e.target.closest('.uf');if(p&&p.dataset.uf!==S.hov){S.hov=p.dataset.uf;liftUF(p.dataset.uf);drawPainel(p.dataset.uf);}});
+    svg.addEventListener('mouseleave',()=>{S.hov='';if(S.uf)liftUF(S.uf);drawPainel(S.uf);});
+    svg.addEventListener('focusin',e=>{const p=e.target.closest('.uf');if(p){liftUF(p.dataset.uf);p.focus({preventScroll:true});drawPainel(p.dataset.uf);}});
+    svg.addEventListener('focusout',()=>drawPainel(S.uf));
+    svg.addEventListener('click',e=>{const p=e.target.closest('.uf');if(p)selectUF(p.dataset.uf);});
+    svg.addEventListener('keydown',e=>{const p=e.target.closest('.uf');if(p&&(e.key==='Enter'||e.key===' ')){e.preventDefault();selectUF(p.dataset.uf);}});
+    drawPainel(S.uf);};
+  drawPainel(S.uf);
+  if(MAP)wire();else loadMap().then(()=>{if(S.lastView!==viewKey)return;document.getElementById('mapa').innerHTML=mapSVG();wire();}).catch(()=>{document.getElementById('mapa').innerHTML='<p class="muted">Não foi possível carregar o mapa. Use as siglas abaixo.</p>';});
+  loadProps().then(()=>{if(S.lastView!==viewKey)return;stateRows();drawPainel(S.uf);const el=document.getElementById('home-votes');if(el)el.innerHTML=lastVotes.map(i=>voteRow(i)).join('');});
+}
+function vTema(k,subSel){
+  if(!TEMAS[k])return vNotFound();
+  const g=aggFor('all').temas[k];
+  const ti=TKEYS.indexOf(k);
+  view.innerHTML=`<div class="stack"><section class="block">
+    <p class="crumb"><a href="#inicio">Mapa</a> / <a href="#assuntos">Assuntos</a></p>
+    <h1 class="page">${TEMAS[k]}</h1>
+    <p class="lead">${nf(sum(g))} projetos de deputados e senadores desde fevereiro de 2023. ${nf(g[0])} ${g[0]===1?'virou':'viraram'} lei e ${nf(g[3])} estão parados.</p>
+    ${trilho(g)}
+  </section>
+  <section class="block" id="subwrap"><h2>Escolha um tema mais específico</h2><p class="muted">Carregando…</p></section>
+  <section class="block" id="lwrap"></section></div>`;
+  loadProps().then(d=>{if(!S.lastView.startsWith('tema-'+k))return;
+    const bit=1<<ti;const all=[];d.rows.forEach((r,i)=>{if(r[F.tm]&bit)all.push(i);});
+    const subs=CORE.subs.map((x,j)=>[j,x]).filter(([j,x])=>x[0]===ti);
+    const cnt={};subs.forEach(([j])=>cnt[j]=[0,0,0,0,0,0]);
+    all.forEach(i=>{const r=d.rows[i];if(!isLeg(r))return;for(const j of r[F.sub])if(cnt[j])cnt[j][r[F.b]]++;});
+    const order=subs.filter(([j,x])=>x[1]!=='Outros').sort((a,b)=>sum(cnt[b[0]])-sum(cnt[a[0]])).concat(subs.filter(([j,x])=>x[1]==='Outros'));
+    const sel=subSel!=null&&cnt[subSel]?subSel:null;
+    document.getElementById('subwrap').innerHTML=`<h2>Escolha um tema mais específico</h2>
+      <ul class="rows">${order.map(([j,x])=>{const c=cnt[j];return `<li><button class="sub-row" data-act="sub" data-k="${k}" data-j="${j}" aria-pressed="${sel===j}"><span class="tn">${x[1]==='Outros'?'Outros projetos que tocam no assunto':esc(x[1])}</span>${trilho(c,true)}<span class="tc">${nf(sum(c))} projetos, ${nf(c[0])} ${c[0]===1?'virou':'viraram'} lei</span></button></li>`;}).join('')}</ul>
+      <p class="small muted">A separação é automática, por palavras da ementa e pelas leis que o projeto altera. Um projeto pode estar em mais de um tema.</p>`;
+    const base=sel==null?all:all.filter(i=>d.rows[i][F.sub].includes(sel));
+    const label=sel==null?'Todos os projetos':esc(CORE.subs[sel][1]==='Outros'?'Outros projetos que tocam no assunto':CORE.subs[sel][1]);
+    document.getElementById('lwrap').innerHTML=`<h2>${label}</h2>${sel!=null?`<p><a href="#tema-${k}">Ver todos os projetos de ${TEMAS[k].toLowerCase()}</a></p>`:''}`+startList(base,{legToggle:true});drawList();
+    if(sel!=null)document.getElementById('lwrap').scrollIntoView({block:'start'});
+  });
+}
+function statusFrase(r){
+  const b=BK[r[F.b]].k,ori=r[F.ori],mov=lastMov(r);
+  const cs=r[F.cs]>=0?PROPS.sit[r[F.cs]]:'',ss=r[F.ss]>=0?PROPS.sit[r[F.ss]]:'';
+  if(b==='lei'){const vet=/vetad/i.test(cs+' '+ss)&&/norma/i.test(cs+' '+ss);return vet?`Virou lei depois que o Congresso derrubou o veto do presidente. Registro em ${fdate(mov)}.`:`Publicada como lei. Registro em ${fdate(mov)}.`;}
+  if(b==='apr'){
+    if(ori===0)return `Aprovado na Câmara. ${r[F.sf]&&ss?`No Senado, a situação é “${esc(ss.toLowerCase())}” desde ${fdate(r[F.sdt])}.`:'Agora depende do Senado ou da sanção.'}`;
+    if(ori===1)return `Aprovado no Senado. ${r[F.cd]&&cs?`Na Câmara, a situação é “${esc(cs.toLowerCase())}” desde ${fdate(r[F.cdt])}.`:'Agora depende da Câmara ou da sanção.'}`;
+    return 'Aprovado em uma das Casas. Agora depende da outra Casa ou da sanção.';
+  }
+  if(b==='and')return `Em andamento. A última movimentação foi em ${fdate(mov)}.`;
+  if(b==='par')return `Parado há ${ago(mov)}. A última movimentação foi em ${fdate(mov)}.`;
+  if(b==='ape')return 'Anexado a outro projeto parecido. Só avança se o projeto principal avançar.';
+  return `Encerrado${cs||ss?`: ${esc((ori===1?ss||cs:cs||ss).toLowerCase())}`:''}.`;
+}
+function steps(r){
+  const b=BK[r[F.b]].k,ori=r[F.ori];
+  const lab=ori===0?['Apresentado','Câmara','Senado','Virou lei']:ori===1?['Apresentado','Senado','Câmara','Virou lei']:['Apresentado','Primeira Casa','Segunda Casa','Virou lei'];
+  const other=ori===1?r[F.cd]:r[F.sf];
+  let cls=['done','','',''];
+  if(b==='lei')cls=['done','done','done','done'];
+  else if(b==='apr')cls=['done','done','now',''];
+  else if(b==='enc')cls=other&&ori!==2?['done','done','stop','']:['done','stop','',''];
+  else cls=['done','now '+b,'',''];
+  return `<ol class="steps" aria-label="Etapas">${lab.map((l,i)=>`<li class="${cls[i]}">${l}${cls[i].startsWith('now')?' (está aqui)':cls[i]==='stop'?' (parou aqui)':''}</li>`).join('')}</ol>`;
+}
+function vProjeto(id){
+  view.innerHTML=`<p class="muted">Carregando o projeto…</p>`;
+  loadProps().then(d=>{if(S.lastView!=='p-'+id)return;const i=RIDX[id];if(i==null)return vNotFound();const r=d.rows[i];
+    const cs=r[F.cs]>=0?d.sit[r[F.cs]]:'',ss=r[F.ss]>=0?d.sit[r[F.ss]]:'',co=r[F.co]>=0?d.org[r[F.co]]:'';
+    const temas=TKEYS.filter((k,j)=>r[F.tm]&(1<<j));
+    const au=r[F.au];const votes=(VBYROW[i]||[]);
+    view.innerHTML=`<div class="stack">
+    <section class="block">
+      <p class="crumb"><a href="#inicio">Mapa</a> / <a href="#assuntos">Assuntos</a>${temas[0]?` / <a href="#tema-${temas[0]}">${TEMAS[temas[0]]}</a>`:''} / ${rname(r)}</p>
+      <h1 class="page">${rname(r)}${r[F.ap]?`: ${esc(r[F.ap])}`:''}</h1>
+      <div id="resumo"></div>
+      <p class="muted" style="max-width:68ch"><b style="color:var(--ink)">Ementa oficial${/…$/.test(r[F.em])?', início':''}:</b> ${esc(r[F.em])}${/…$/.test(r[F.em])?' <span class="small">O texto completo está na página oficial, logo abaixo.</span>':''}</p>
+      <p>${stTag(r)}</p>
+      <p style="max-width:68ch">${statusFrase(r)}</p>
+      ${steps(r)}
+    </section>
+    <section class="two">
+      <div class="kv"><h3>Quem propôs</h3>
+        <ul>${au.map(a=>`<li>${author(a)}</li>`).join('')||'<li>Autoria não informada</li>'}</ul>
+        ${r[F.na]>au.length?`<p class="small muted">E mais ${nf(r[F.na]-au.length)} ${r[F.na]-au.length>1?'assinaturas':'assinatura'}. A lista completa está na página oficial.</p>`:''}
+        <p class="small muted">Apresentado em ${fdate(r[F.da])}.</p>
+      </div>
+      ${r[F.cd]?`<div class="kv"><h3>Na Câmara</h3><dl><dt>Situação</dt><dd>${esc(cs||'Sem situação informada')}</dd>${co?`<dt>Onde está</dt><dd>${esc(co)}</dd>`:''}<dt>Última movimentação</dt><dd>${fdate(r[F.cdt])}</dd></dl><a href="https://www.camara.leg.br/propostas-legislativas/${r[F.cd]}" target="_blank" rel="noopener">Ver na página da Câmara</a></div>`:''}
+      ${r[F.sf]?`<div class="kv"><h3>No Senado</h3><dl><dt>Situação</dt><dd>${esc(ss||'Sem situação informada')}</dd><dt>Desde</dt><dd>${fdate(r[F.sdt])}</dd></dl><a href="https://www25.senado.leg.br/web/atividade/materias/-/materia/${r[F.sf]}" target="_blank" rel="noopener">Ver na página do Senado</a></div>`:''}
+    </section>
+    <section class="block">
+      <h2>Como cada um votou</h2>
+      ${votes.length?votes.map(vi=>{const v=CORE.votes[vi];return `<div class="block"><h3>${CASA[v.casa]}, ${fdate(v.data)}: ${resTxt(v).toLowerCase()}</h3>${quorumNota(v)?`<p class="note">${quorumNota(v).trim()}</p>`:''}<p class="muted" style="max-width:68ch">${esc(v.desc)}</p><div style="max-width:420px">${placar(v)}</div><p class="small muted">${votaram(v)}</p>${painel(v)}</div>`;}).join(''):`<p class="note">Não há votação nominal do texto principal deste projeto nos dados desde 2023. Ou ele ainda não foi votado em plenário, ou foi votado de forma simbólica, sem registro do voto de cada parlamentar.</p>`}
+    </section>
+    <section class="block">
+      <h2>Quanto custa</h2>
+      <p class="note">Os dados abertos não trazem o custo de cada projeto. Quando existe uma estimativa, ela fica dentro dos pareceres e das notas técnicas. Extrair esse número de forma confiável é o próximo passo deste protótipo.</p>
+    </section>
+    <section class="block"><h2>Assuntos</h2><div class="tags">${temas.map(k=>`<a href="#tema-${k}">${TEMAS[k]}</a>`).join('')}${r[F.sub].filter(j=>CORE.subs[j][1]!=='Outros').map(j=>`<a href="#tema-${TKEYS[CORE.subs[j][0]]}-s${j}">${esc(CORE.subs[j][1])}</a>`).join('')}</div></section>
+    </div>`;
+    document.title=`${rname(r)} · O que eles fizeram por você`;
+    showResumo(i,'p-'+id);});
+}
+function parlVotes(pi){
+  const p=CORE.parl[pi],casa=p[P.casa],pos=HL[casa].indexOf(pi);
+  const mine=CORE.votes.map((v,i)=>[i,v]).filter(([i,v])=>v.casa===casa).map(([i,v])=>[i,v,v.v.charCodeAt(pos)-48]);
+  const rec=mine.filter(x=>x[2]>0);if(!rec.length)return {rows:[],c:[0,0,0,0,0,0,0,0,0],first:0,last:0,voted:0};
+  const dates=rec.map(x=>x[1].data),first=Math.min(...dates),last=Math.max(...dates);
+  const rows=mine.filter(x=>x[1].data>=first&&x[1].data<=last);
+  const c=[0,0,0,0,0,0,0,0,0];rows.forEach(x=>c[x[2]]++);
+  return {rows,c,first,last,voted:c[1]+c[2]+c[3]+c[4]};
+}
+let PSTAT=null;
+function pstats(){
+  if(PSTAT)return PSTAT;
+  PSTAT=CORE.parl.map((p,i)=>{const st=p.slice(P.st,P.st+6);const pv=parlVotes(i);
+    const tm=p[P.tm]||[];let top=-1,tv=0;tm.forEach((n,j)=>{if(n>tv&&TKEYS[j]!=='outros'){tv=n;top=j;}});
+    const pr=p[P.pr];let pres=null,presN=0,presOk=0;
+    if(pr){if(pr[0]===0){presOk=pr[1];presN=pr[2];}else{presOk=pr[1];presN=pr[4];}if(presN>=20)pres=presOk/presN;}
+    return {n:sum(st),lei:st[0],apr:st[1],st,voted:pv.voted,total:pv.rows.length,pres,presN,presOk,top};});
+  return PSTAT;
+}
+const initials=n=>{const w=String(n).replace(/^(dr|dra|pr|pastor|delegad[oa]|coronel|capitão|sargento|general|professora?|enfermeira|missionário|cabo)\.?\s+/i,'').split(/\s+/).filter(x=>x.length>1&&!/^(de|da|do|dos|das|e)$/i.test(x));return ((w[0]||'')[0]+((w[w.length-1]||'')[0]||'')).toUpperCase();};
+const pct=x=>Math.round(x*100)+'%';
+function presCurta(i){const s=pstats()[i];if(s.pres==null)return '';return CORE.parl[i][P.casa]?`Presente em ${pct(s.pres)} dos dias de votação`:`Presença em plenário: ${pct(s.pres)}`;}
+function feito(i){
+  const s=pstats()[i];
+  if(!s.n)return `Nenhum projeto como autor principal desde 2023.`;
+  return `Apresentou <b>${nf(s.n)}</b> ${s.n>1?'projetos':'projeto'}. <b>${nf(s.lei)}</b> ${s.lei===1?'virou':'viraram'} lei${s.apr?` e <b>${nf(s.apr)}</b> ${s.apr===1?'passou':'passaram'} em uma Casa`:''}.`;
+}
+function pcard(i){
+  const p=CORE.parl[i],s=pstats()[i];
+  return `<a class="pc" href="${phref(i)}"><span class="pc-top"><span class="av" aria-hidden="true">${esc(initials(p[P.nome]))}</span><span><span class="pn">${esc(p[P.nome])}</span><br><span class="pm">${esc(p[P.pt]||'Sem partido')}${p[P.uf]?' · '+esc(p[P.uf]):''} · ${p[P.casa]?'Senado':'Câmara'}${p[P.ex]?'':' · fora do mandato'}</span></span></span>
+    <span class="pc-feito">${feito(i)}</span>${s.n?trilho(s.st,true):''}
+    <span class="pc-foot">${s.pres!=null?`<span>${presCurta(i)}</span>`:''}${s.top>=0?`<span>Mais atua em ${TEMAC[TKEYS[s.top]]}</span>`:''}</span></a>`;
+}
+function vParl(key){
+  const pi=PIDX[key];if(pi==null)return vNotFound();
+  const p=CORE.parl[pi],casa=p[P.casa],s=pstats()[pi];
+  const pv=parlVotes(pi);S.pv=pv;
+  const official=casa?`https://www25.senado.leg.br/web/senadores/senador/-/perfil/${p[P.id]}`:`https://www.camara.leg.br/deputados/${p[P.id]}`;
+  const tm=(p[P.tm]||[]).map((n,j)=>[j,n]).filter(x=>x[1]).sort((a,b)=>b[1]-a[1]);const tmax=tm.length?tm[0][1]:1;
+  const viewKey=S.lastView;
+  view.innerHTML=`<div class="stack">
+  <section class="block">
+    <p class="crumb"><a href="#inicio">Mapa</a> / ${p[P.uf]?`<a href="#estado-${p[P.uf].toLowerCase()}">${esc(UFN[p[P.uf]]||p[P.uf])}</a> / `:''}<a href="#parlamentares">Parlamentares</a></p>
+    <div class="prof-head"><span class="av lg" aria-hidden="true">${esc(initials(p[P.nome]))}</span><div>
+      <h1 class="page">${esc(p[P.nome])}</h1>
+      ${p[P.ex]?'':`<p class="small" style="color:var(--par);font-weight:700">Fora do mandato hoje: foi suplente, se licenciou ou deixou o cargo.</p>`}
+      <p class="muted">${cargo(p)}${p[P.uf]?` por <a href="#parlamentares" data-act="ufgo" data-uf="${esc(p[P.uf])}">${esc(UFN[p[P.uf]]||p[P.uf])}</a>`:''}, ${p[P.pt]?`<a href="#partido-${slug(p[P.pt])}">${esc(p[P.pt])}</a>`:'sem partido'}. <a href="${official}" target="_blank" rel="noopener">Página oficial</a></p>
+    </div></div>
+    <div class="tiles">
+      <div class="tile"><span class="tv">${nf(s.n)}</span><span class="tl">projetos apresentados desde 2023</span></div>
+      <div class="tile"><span class="tv"><i class="b-lei"></i>${nf(s.lei)}</span><span class="tl">${s.lei===1?'virou lei':'viraram lei'}</span></div>
+      <div class="tile"><span class="tv"><i class="b-apr"></i>${nf(s.apr)}</span><span class="tl">${s.apr===1?'passou':'passaram'} em uma Casa</span></div>
+      <div class="tile"><span class="tv">${s.pres!=null?pct(s.pres):'—'}</span><span class="tl">${s.pres!=null?(casa?`presente em ${s.presOk} de ${s.presN} dias com votação nominal`:`presente em ${s.presOk} de ${s.presN} sessões deliberativas do Plenário`):'sem registro de presença suficiente'}</span></div>
+    </div>
+    ${s.n?`<div class="block"><p>Situação dos ${nf(s.n)} projetos</p>${trilho(s.st)}${legend(s.st)}</div>`:''}
+  </section>
+  ${tm.length?`<section class="block"><h2>Temas em que mais atua</h2><div class="tbars">${tm.map(([j,n])=>`<a class="tbar" href="#tema-${TKEYS[j]}"><span class="tbl">${TEMAS[TKEYS[j]]}</span><span class="tbt"><i style="width:${n/tmax*100}%"></i></span><span class="tbn">${nf(n)}</span></a>`).join('')}</div><p class="small muted">Número de projetos em cada assunto. Um projeto pode estar em mais de um.</p></section>`:''}
+  <section class="block" id="feitos"><h2>O que saiu do papel</h2><p class="muted">Carregando…</p></section>
+  ${presencaHTML(pi)}
+  <section class="block">
+    <h2>Como votou</h2>
+    ${pv.rows.length?`<p style="max-width:68ch">Entre ${fdate(pv.first)} e ${fdate(pv.last)}, votou em <b>${pv.voted}</b> de <b>${pv.rows.length}</b> votações nominais de texto principal: ${pv.c[1]} sim, ${pv.c[2]} não${pv.c[3]?`, ${pv.c[3]} abstenç${pv.c[3]>1?'ões':'ão'}`:''}${pv.c[4]?`, ${pv.c[4]} em obstrução`:''}.</p>
+    <div class="tablewrap"><table><thead><tr><th>Data</th><th>Projeto</th><th>Voto</th><th>Resultado</th></tr></thead><tbody id="pv-body">${pvRows(pv,10)}</tbody></table></div>
+    ${pv.rows.length>10?`<button class="btn ghost more" data-act="pvall">Ver todas as ${pv.rows.length} votações</button>`:''}
+    <p class="small muted">Da mais recente para a mais antiga, entre o primeiro e o último voto registrado. “Sem voto registrado” pode ser ausência, licença ou período fora do mandato.</p>`
+    :`<p class="note">Não há voto registrado nas votações nominais listadas desde 2023.</p>`}
+  </section>
+  <section class="block"><div class="sec-head"><h2>Todos os projetos</h2>
+    <div class="seg" role="group" aria-label="Tipo de autoria" id="au-seg" hidden>
+      <button data-act="autab" data-t="1" aria-pressed="true">Autor principal</button>
+      <button data-act="autab" data-t="2" aria-pressed="false">Coautor</button>
+    </div></div>
+    <div id="lwrap"><p class="muted">Carregando os projetos…</p></div>
+  </section></div>`;
+  loadProps().then(d=>{if(S.lastView!==viewKey)return;
+    S.pv=pv;const b=document.getElementById('pv-body');if(b)b.innerHTML=pvRows(pv,10);
+    const mine=[];d.rows.forEach((r,i)=>{if(r[F.au][0]===pi)mine.push(i);});
+    const byMov=(a,b)=>lastMov(d.rows[b])-lastMov(d.rows[a]);
+    const isK=(i,k)=>BK[d.rows[i][F.b]].k===k,isL=i=>isLeg(d.rows[i]);
+    const leis=mine.filter(i=>isK(i,'lei')&&isL(i)).sort(byMov),aprs=mine.filter(i=>isK(i,'apr')&&isL(i)).sort(byMov);
+    const old=mine.filter(i=>!isL(i)&&(isK(i,'lei')||isK(i,'apr'))).sort(byMov);
+    const f=document.getElementById('feitos');
+    f.innerHTML=`<h2>O que saiu do papel</h2>`+(leis.length||aprs.length?
+      (leis.length?`<h3 class="feitos-h"><span class="st"><i class="sw b-lei"></i>Projetos que viraram lei (${leis.length})</span></h3><ul class="rows">${leis.map(projItem).join('')}</ul>`:'')+
+      (aprs.length?`<h3 class="feitos-h"><span class="st"><i class="sw b-apr"></i>Aprovados em uma Casa, esperando a outra (${aprs.length})</span></h3><ul class="rows">${aprs.slice(0,8).map(projItem).join('')}</ul>${aprs.length>8?`<p class="small muted">E mais ${aprs.length-8}. Use o filtro “Passou em uma Casa” na lista completa abaixo.</p>`:''}`:'')
+      :`<p class="note">Nenhum projeto apresentado desde 2023 em que é autor principal virou lei ou foi aprovado em uma Casa. A lista completa está abaixo.</p>`)+
+      (old.length?`<h3 class="feitos-h"><span class="st">Outros projetos que avançaram: anteriores a 2023 ou apresentados na outra Casa (${old.length})</span></h3><p class="small muted">Não entram nos números do topo da página, que contam só o que foi apresentado desde fevereiro de 2023.</p><ul class="rows">${old.map(projItem).join('')}</ul>`:'');
+    S.parlTab={pi,t:1};drawParlList();});
+}
+function presencaHTML(pi){
+  const p=CORE.parl[pi],pr=p[P.pr];if(!pr)return '';
+  const R=CORE.presRef||{};
+  if(pr[0]===0){const [_,ok,tot,com]=pr;if(!tot)return '';const aus=tot-ok;
+    return `<section class="block"><h2>Presença e faltas</h2>
+      <div class="pbar" style="height:16px;max-width:640px" role="img" aria-label="Presente em ${ok} de ${tot} sessões"><i class="v1" style="flex:${ok} 0 0"></i>${aus?`<i class="v2" style="flex:${aus} 0 0"></i>`:''}</div>
+      <div class="vkey"><span><i class="sw v1"></i>Presente: <b>${nf(ok)}</b> sessões</span><span><i class="sw v2"></i>Ausente: <b>${nf(aus)}</b> sessões</span><span>Reuniões de comissão com presença: <b>${nf(com)}</b></span></div>
+      <p class="small muted" style="max-width:70ch">Sessões deliberativas do Plenário da Câmara entre a primeira e a última presença registrada, desde fevereiro de 2023 (${nf(R.cd?R.cd.sessoes:tot)} sessões no total). A Câmara não informa nos dados abertos quais ausências foram justificadas, como licença médica ou missão oficial.</p></section>`;}
+  const [_,ok,just,falta,dias,ls,lp,lm,lo]=pr;
+  const lic=[[ls,'saúde'],[lp,'interesse particular'],[lm,'missão ou atividade parlamentar'],[lo,'outros motivos']].filter(x=>x[0]);
+  return `<section class="block"><h2>Presença e faltas</h2>
+    ${dias?`<div class="pbar" style="height:16px;max-width:640px" role="img" aria-label="Presente em ${ok} de ${dias} dias"><i class="v1" style="flex:${ok} 0 0"></i>${just?`<i class="v3" style="flex:${just} 0 0"></i>`:''}${falta?`<i class="v2" style="flex:${falta} 0 0"></i>`:''}</div>
+    <div class="vkey"><span><i class="sw v1"></i>Presente: <b>${nf(ok)}</b> dias</span><span><i class="sw v3"></i>Ausência justificada: <b>${nf(just)}</b></span><span><i class="sw v2"></i>Falta sem justificativa: <b>${nf(falta)}</b></span></div>`:''}
+    ${lic.length?`<p>Licenças desde fevereiro de 2023: ${lic.map(([n,t])=>`<b>${nf(n)}</b> ${n===1?'dia':'dias'} por ${t}`).join(', ')}.</p>`:`<p class="muted">Nenhuma licença registrada desde fevereiro de 2023.</p>`}
+    <p class="small muted" style="max-width:70ch">Dias com votação nominal no Plenário do Senado (${nf(R.sf?R.sf.dias:dias)} dias desde fevereiro de 2023). Ausência justificada inclui licença médica, licença particular, missão oficial e atividade parlamentar fora do Plenário, conforme registrado pelo Senado em cada votação. Licenças vêm do cadastro de cada senador.</p></section>`;
+}
+function pvRows(pv,lim){
+  const rows=pv.rows.slice().sort((a,b)=>b[1].data-a[1].data);
+  return (lim?rows.slice(0,lim):rows).map(([i,v,c])=>{const r=PROPS?PROPS.rows[v.row]:null;const t=r?(RES[rid(r)]?RES[rid(r)].manchete:(r[F.ap]||r[F.em])):v.desc;
+    return `<tr><td>${fdate(v.data)}</td><td>${r?`<a href="#p-${rid(r)}">${rname(r)}</a> `:''}${esc(t.slice(0,110))}${t.length>110?'…':''}</td><td><span class="vpill"><i class="sw v${c}"></i>${VOTO[c]}</span></td><td>${resTxt(v)}</td></tr>`;}).join('');
+}
+function drawParlList(){
+  const {pi,t}=S.parlTab;const rows=PROPS.rows;const main=[],co=[];
+  rows.forEach((r,i)=>{const k=r[F.au].indexOf(pi);if(k===0)main.push(i);else if(k>0)co.push(i);});
+  const seg=document.getElementById('au-seg');
+  if(seg){seg.hidden=!co.length;seg.querySelectorAll('button').forEach(b=>{const on=+b.dataset.t===t;b.setAttribute('aria-pressed',on);b.textContent=(b.dataset.t==='1'?`Autor principal (${nf(main.length)})`:`Coautor (${nf(co.length)})`);});}
+  const base=t===1?main:co;
+  document.getElementById('lwrap').innerHTML=base.length?startList(base,{hideOri:true})+(t===2?`<p class="small muted">Coautoria considera só as três primeiras assinaturas de cada projeto.</p>`:''):`<p class="empty">Nenhum projeto nesta lista.</p>`;
+  if(base.length)drawList();
+}
+function vParlamentares(pt,uf){
+  const st=S.parl;if(pt!==undefined){st.pt=pt;st.page=1;}if(uf!==undefined){st.uf=uf;st.page=1;}
+  const act=CORE.parl.map((p,i)=>i).filter(i=>CORE.parl[i][P.ativo]);
+  const pts=[...new Set(act.map(i=>CORE.parl[i][P.pt]).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
+  const S2=pstats();
+  const top=(f,n,fmt,filt)=>act.filter(filt||(()=>true)).sort((a,b)=>f(b)-f(a)||S2[b].n-S2[a].n).slice(0,n).map(i=>`<li><span class="dn"><a href="${phref(i)}">${esc(CORE.parl[i][P.nome])}</a><span>${esc(CORE.parl[i][P.pt]||'')}${CORE.parl[i][P.uf]?' · '+esc(CORE.parl[i][P.uf]):''} · ${CASA[CORE.parl[i][P.casa]]}</span></span><span class="dv">${fmt(i)}</span></li>`).join('');
+  view.innerHTML=`<div class="stack">
+  <section class="block">
+    <p class="crumb"><a href="#inicio">Mapa</a></p>
+    <h1 class="page">O que cada parlamentar fez</h1>
+    <p class="lead">Encontre seu deputado ou senador e veja o que ele propôs, o que virou lei e como votou desde fevereiro de 2023. O ranking de quem mais aprovou está na <a href="#inicio">página do mapa</a>.</p>
+    <div class="hub-search">
+      <label class="vis" for="pq">Buscar por nome</label>
+      <input class="big" type="search" id="pq" placeholder="Ex.: Tabata, Romário, Kim" value="${esc(st.q)}" autocomplete="off">
+      <div class="filters">
+        <label class="skip" for="puf">Estado</label><select id="puf"><option value="">Seu estado: todos</option>${Object.keys(UFN).sort((a,b)=>UFN[a].localeCompare(UFN[b])).map(u=>`<option value="${u}">${UFN[u]}</option>`).join('')}</select>
+        <label class="skip" for="pcasa">Casa</label><select id="pcasa"><option value="">Câmara e Senado</option><option value="0">Deputados (Câmara)</option><option value="1">Senadores (Senado)</option></select>
+        <label class="skip" for="ppt">Partido</label><select id="ppt"><option value="">Todos os partidos</option>${pts.map(u=>`<option value="${esc(u)}">${esc(u)}</option>`).join('')}</select>
+        <label class="chip" for="ptodos" style="cursor:pointer"><input type="checkbox" id="ptodos" ${st.todos?'checked':''}> Incluir quem já deixou o cargo</label>
+        <label class="skip" for="psort">Ordem</label><select id="psort"><option value="lei">Mais projetos que viraram lei</option><option value="n">Mais projetos apresentados</option><option value="pres">Maior presença</option><option value="nome">Nome</option></select>
+      </div>
+    </div>
+  </section>
+  <section class="block" id="pdest"></section>
+  <section class="block" id="presult">
+    <div class="sec-head"><h2 id="ptitle">Todos</h2><p class="small muted" id="pcount"></p></div>
+    <div id="pgrids"></div>
+    <button class="btn ghost more" id="pmore" data-act="pmore">Mostrar mais</button>
+  </section>
+  <section class="block"><p class="note">Quantidade de projetos não mede qualidade. Presença: na Câmara, sessões deliberativas do Plenário; no Senado, dias com votação nominal. As duas medidas não são iguais. O partido é o atual ou o último registrado.</p></section>
+  </div>`;
+  document.getElementById('pcasa').value=st.casa;document.getElementById('puf').value=st.uf;document.getElementById('ppt').value=st.pt;document.getElementById('psort').value=st.sort;
+  S.parlDest=`<h2>Destaques da legislatura</h2><div class="dest">
+    <div><h3>Mais projetos que viraram lei</h3><ol>${top(i=>S2[i].lei,5,i=>nf(S2[i].lei))}</ol></div>
+    <div><h3>Maior presença nas votações</h3><ol>${top(i=>S2[i].pres==null?-1:S2[i].pres+S2[i].total/1e5,5,i=>pct(S2[i].pres),i=>S2[i].total>=40)}</ol></div>
+    <div><h3>Mais projetos apresentados</h3><ol>${top(i=>S2[i].n,5,i=>nf(S2[i].n))}</ol></div>
+  </div><p class="small muted">Presença: só quem teve ao menos 40 votações nominais no período.</p>`;
+  drawParl();
+}
+function drawParl(){
+  const st=S.parl,q=norm(st.q).trim(),S2=pstats();
+  const filtering=!!(q||st.uf||st.pt||st.casa);
+  const dest=document.getElementById('pdest');dest.innerHTML='';dest.hidden=true;
+  let idx=CORE.parl.map((p,i)=>i).filter(i=>{const p=CORE.parl[i];return p[P.ativo]&&(st.todos||p[P.ex])&&(st.casa===''||p[P.casa]===+st.casa)&&(!st.uf||p[P.uf]===st.uf)&&(!st.pt||p[P.pt]===st.pt)&&(!q||norm(p[P.nome]).includes(q));});
+  const cmp={lei:(a,b)=>S2[b].lei-S2[a].lei||S2[b].apr-S2[a].apr||S2[b].n-S2[a].n,n:(a,b)=>S2[b].n-S2[a].n,pres:(a,b)=>(S2[b].pres??-1)-(S2[a].pres??-1),nome:(a,b)=>CORE.parl[a][P.nome].localeCompare(CORE.parl[b][P.nome])}[st.sort];
+  idx.sort(cmp);
+  const title=st.uf?`Quem representa ${UFN[st.uf]}`:q?'Resultado da busca':st.pt?`Parlamentares do ${esc(st.pt)}`:'Todos os parlamentares';
+  document.getElementById('ptitle').textContent=title;
+  document.getElementById('pcount').textContent=`${nf(idx.length)} parlamentar${idx.length===1?'':'es'}`;
+  const g=document.getElementById('pgrids');
+  if(!idx.length){g.innerHTML=`<p class="empty">Ninguém com esses filtros. Confira a grafia do nome ou limpe os filtros.</p>`;document.getElementById('pmore').hidden=true;return;}
+  if(st.uf&&st.casa===''){
+    const sen=idx.filter(i=>CORE.parl[i][P.casa]===1),dep=idx.filter(i=>CORE.parl[i][P.casa]===0);
+    const shown=dep.slice(0,st.page*24);
+    g.innerHTML=(sen.length?`<h3 style="margin:6px 0 10px">Senadores (${sen.length})</h3><div class="grid">${sen.map(pcard).join('')}</div>`:'')+
+      (dep.length?`<h3 style="margin:22px 0 10px">Deputados federais (${dep.length})</h3><div class="grid">${shown.map(pcard).join('')}</div>`:'');
+    document.getElementById('pmore').hidden=shown.length>=dep.length;
+    if(sen.length>3)g.insertAdjacentHTML('afterbegin',`<p class="small muted">O estado tem 3 vagas no Senado. Aparecem mais nomes quando houve suplentes ou troca de mandato no período.</p>`);
+    return;
+  }
+  const shown=idx.slice(0,st.page*24);
+  g.innerHTML=`<div class="grid">${shown.map(pcard).join('')}</div>`;
+  document.getElementById('pmore').hidden=shown.length>=idx.length;
+}
+function vPartidos(){
+  const m={};CORE.parl.forEach(p=>{if(!p[P.ex])return;const k=p[P.pt]||'Sem partido';const o=m[k]=m[k]||{n:0,st:[0,0,0,0,0,0]};o.n++;o.st=add(o.st,p.slice(P.st,P.st+6));});
+  const list=Object.entries(m).sort((a,b)=>sum(b[1].st)-sum(a[1].st));
+  view.innerHTML=`<div class="stack"><section class="block">
+    <p class="crumb"><a href="#inicio">Mapa</a></p>
+    <h1 class="page">Partidos</h1>
+    <p class="lead">Projetos apresentados pelos parlamentares de cada partido desde fevereiro de 2023, somando Câmara e Senado.</p>
+    <div class="tablewrap"><table><thead><tr><th>Partido</th><th class="num">Parlamentares</th><th class="num">Projetos</th><th class="num">Passaram em uma Casa</th><th class="num">Viraram lei</th><th>Situação dos projetos</th></tr></thead>
+    <tbody>${list.map(([k,o])=>`<tr><td><a href="#partido-${slug(k)}">${esc(k)}</a></td><td class="num">${nf(o.n)}</td><td class="num">${nf(sum(o.st))}</td><td class="num">${nf(o.st[1])}</td><td class="num">${nf(o.st[0])}</td><td>${sum(o.st)?trilho(o.st,true):''}</td></tr>`).join('')}</tbody></table></div>
+    <div class="note"><p>Leia com cuidado. Quantidade de projetos não mede qualidade, e partidos maiores apresentam mais. Cada parlamentar conta pelo partido atual ou pelo último registrado, então quem trocou de partido leva seus projetos junto.</p></div>
+  </section></div>`;
+}
+function vVotacoes(){
+  const st=S.vot;const anos=[...new Set(CORE.votes.map(v=>Math.floor(v.data/10000)))].sort((a,b)=>b-a);
+  view.innerHTML=`<div class="stack"><section class="block">
+    <p class="crumb"><a href="#inicio">Mapa</a></p>
+    <h1 class="page">Votações nominais</h1>
+    <p class="lead">A votação final do texto principal de cada PL, PLP e PEC que teve voto registrado em plenário desde 2023. Abra um projeto para ver o voto de cada parlamentar.</p>
+    <div class="filters">
+      <div class="seg" role="group" aria-label="Casa"><button data-act="vcasa" data-c="" aria-pressed="${st.casa===''}">Câmara e Senado</button><button data-act="vcasa" data-c="0" aria-pressed="${st.casa==='0'}">Câmara</button><button data-act="vcasa" data-c="1" aria-pressed="${st.casa==='1'}">Senado</button></div>
+      <label class="skip" for="vano">Ano</label><select id="vano"><option value="">Todos os anos</option>${anos.map(a=>`<option>${a}</option>`).join('')}</select>
+    </div>
+    <p class="small muted" id="vcount"></p>
+    <ul class="rows" id="vrows"></ul><button class="btn ghost more" id="vmore" data-act="vmore">Mostrar mais</button>
+  </section></div>`;
+  document.getElementById('vano').value=st.ano;
+  drawVotes();loadProps().then(()=>{if(S.lastView==='votacoes')drawVotes();});
+}
+function drawVotes(){
+  const st=S.vot;const idx=CORE.votes.map((v,i)=>i).filter(i=>{const v=CORE.votes[i];return (st.casa===''||v.casa===+st.casa)&&(!st.ano||Math.floor(v.data/10000)===+st.ano);});
+  document.getElementById('vcount').textContent=`${nf(idx.length)} votaç${idx.length===1?'ão':'ões'}.`;
+  const shown=idx.slice(0,(st.page||1)*40);
+  document.getElementById('vrows').innerHTML=shown.map(i=>voteRow(i)).join('')||`<li class="empty">Nenhuma votação com esses filtros.</li>`;
+  const m=document.getElementById('vmore');if(m)m.hidden=shown.length>=idx.length;
+}
+function vBusca(){
+  const q=S.q.trim();const nq=norm(q);
+  const ps=nq?CORE.parl.map((p,i)=>i).filter(i=>CORE.parl[i][P.ativo]&&norm(CORE.parl[i][P.nome]).includes(nq)).slice(0,12):[];
+  view.innerHTML=`<div class="stack"><section class="block">
+    <p class="crumb"><a href="#inicio">Mapa</a></p>
+    <h1 class="page">${q?`Resultados para “${esc(q)}”`:'Busca'}</h1>
+    ${q?'':'<p class="lead">Digite um nome ou um assunto no campo de busca, no topo da página.</p>'}
+  </section>
+  ${q?`<section class="block"><h2>Parlamentares</h2>${ps.length?`<div class="grid">${ps.map(pcard).join('')}</div>`:'<p class="muted">Nenhum parlamentar com esse nome.</p>'}</section>
+  <section class="block"><h2>Projetos</h2><div id="lwrap"><p class="muted">Procurando nos projetos…</p></div></section>`:''}</div>`;
+  if(q)loadProps().then(d=>{if(S.lastView!=='busca')return;const base=d.rows.map((r,i)=>i);document.getElementById('lwrap').innerHTML=startList(base,{q});const lq=document.getElementById('lq');drawList();});
+}
+function vComo(){
+  const a=CORE.agg;
+  view.innerHTML=`<div class="prose">
+  <p class="crumb"><a href="#inicio">Mapa</a></p>
+  <h1 class="page">Como funciona</h1>
+  <p class="lead">Este site organiza dados públicos do Congresso para que qualquer pessoa consiga ver o que os parlamentares propuseram e o que aconteceu com cada proposta.</p>
+  <h2>De onde vêm os dados</h2>
+  <p>Tudo vem dos portais de Dados Abertos da <a href="https://dadosabertos.camara.leg.br" target="_blank" rel="noopener">Câmara dos Deputados</a> e do <a href="https://www12.senado.leg.br/dados-abertos" target="_blank" rel="noopener">Senado Federal</a>. A coleta usada aqui é de ${fdate(+CORE.ref.replace(/-/g,''))}. Cada projeto tem um link para a página oficial, que é sempre a fonte que vale.</p>
+  <h2>O que entra</h2>
+  <ul>
+    <li>Projetos de lei (PL), projetos de lei complementar (PLP) e propostas de emenda à Constituição (PEC).</li>
+    <li>Os números da página inicial contam projetos apresentados desde 1º de fevereiro de 2023, início da legislatura atual, em que um deputado ou senador é o autor principal: ${nf(sum(a.cd.tot))} na Câmara e ${nf(sum(a.sf.tot))} no Senado.</li>
+    <li>Requerimentos, moções e homenagens avulsas ficam de fora, assim como medidas provisórias.</li>
+    <li>Projetos do governo, do Judiciário e de comissões aparecem nas listas e nas votações, mas não entram na conta de nenhum parlamentar.</li>
+  </ul>
+  <h2>O que significa cada situação</h2>
+  <ul>${BK.map(b=>`<li><span class="st"><i class="sw b-${b.k}"></i>${b.nome}.</span> ${b.desc}</li>`).join('')}</ul>
+  <p>Na Câmara, “parado” quer dizer que a última tramitação registrada tem mais de ${CORE.stallDays} dias. No Senado, quer dizer que o projeto está na mesma situação há mais de ${CORE.stallDays} dias. O Senado não informa nos dados quando um projeto está anexado a outro, por isso essa situação só aparece para a Câmara.</p>
+  <p>Quando o mesmo projeto aparece nas duas Casas, as informações são reunidas em uma página só. Se uma das Casas registra que ele virou lei, é isso que vale.</p>
+  <h2>Votações</h2>
+  <p>Só existe voto individual quando a votação é nominal. Muitos projetos são aprovados em votação simbólica, e nesses casos não há como saber quem votou a favor ou contra. Aqui aparece, para cada projeto e cada Casa, a última votação nominal do texto principal em plenário desde 2023. Votações de requerimentos, destaques e emendas isoladas ficam de fora.</p>
+  <p>Apresentar um projeto não é o mesmo que aprová-lo, e votar a favor não é o mesmo que ter proposto. O site mostra as duas coisas separadas.</p>
+  <h2>Resumos em linguagem simples</h2>
+  <p>Em alguns projetos há um resumo em linguagem simples, com o que muda, quem é afetado e, quando for o caso, um ponto de atenção. Esses textos são escritos com apoio de inteligência artificial a partir da ementa oficial, e depois lidos e corrigidos por uma pessoa antes de entrar no site. A data da revisão aparece abaixo de cada resumo. Hoje são resumos apenas para projetos que viraram lei ou foram aprovados em uma Casa. Para os demais, a ementa oficial é o texto disponível.</p>
+  <h2>Financiamento e independência</h2>
+  <p>Hoje o site não recebe dinheiro de nenhuma fonte. Ele não aceita recursos de partidos, candidatos, parlamentares, órgãos do governo nem de empresas. Também não vende destaque, posição em ranking nem qualquer resumo mais favorável a alguém.</p>
+  <p>Se no futuro houver apoio voluntário de pessoas, esta página vai mostrar o total recebido e para que ele foi usado. Qualquer mudança nessa regra aparece aqui, com data.</p>
+  <h2>Temas específicos</h2>
+  <p>Dentro de cada assunto, os projetos são separados em temas mais específicos (por exemplo, em Saúde: remédios, saúde mental, planos de saúde). A separação é automática, pelas palavras da ementa e pelas leis que o projeto altera. Quando a ementa só cita o número de uma lei pouco conhecida, o projeto fica em “Outros projetos que tocam no assunto”.</p>
+  <h2>Presença e faltas</h2>
+  <p>Na Câmara, a presença vem da lista oficial de presença de cada evento. O site conta as sessões deliberativas do Plenário desde fevereiro de 2023, entre a primeira e a última presença registrada de cada deputado, e mostra à parte quantas reuniões de comissão ele frequentou. A Câmara não publica nos dados abertos quais ausências foram justificadas.</p>
+  <p>No Senado não há lista de presença por sessão nos dados abertos. O site usa os dias com votação nominal: em cada votação o Senado registra se o senador votou, se estava presente sem votar, se estava ausente com justificativa (licença médica, licença particular, missão oficial, atividade parlamentar) ou se não compareceu. As licenças vêm do cadastro de cada senador.</p>
+  <p>Por isso a presença de deputados e a de senadores não são comparáveis entre si.</p>
+  <h2>Quem está em exercício</h2>
+  <p>A marcação “em exercício” vem das listas oficiais da Câmara e do Senado na data da coleta. Quem foi suplente, se licenciou ou deixou o cargo continua no site, com seus projetos e votos, e aparece como “fora do mandato”.</p>
+  <h2>Conferência dos dados</h2>
+  <p>Os placares calculados a partir dos votos individuais batem com o placar oficial registrado em cada votação. Uma amostra de projetos foi conferida contra as APIs das duas Casas. Quando uma Casa diz que o projeto virou lei e a outra ainda mostra outra situação, vale o registro de que virou lei. Isso acontece, por exemplo, quando o Congresso derruba um veto.</p>
+  <h2>O que ainda falta</h2>
+  <ul>
+    <li>Custo de cada projeto. Os dados abertos não trazem esse número de forma estruturada.</li>
+    <li>Assembleias estaduais e câmaras municipais.</li>
+    <li>Atualização automática todos os dias.</li>
+  </ul>
+  <h2>Limites</h2>
+  <p>A classificação por assunto e por situação é automática e segue as categorias oficiais de cada Casa, agrupadas em nove assuntos. Pode haver erros. O partido exibido é o atual ou o último registrado nos dados.</p>
+  </div>`;
+}
+function vAssuntos(){
+  const g=aggFor('all');
+  view.innerHTML=`<div class="stack"><section class="block">
+    <p class="crumb"><a href="#inicio">Mapa</a></p>
+    <h1 class="page">Assuntos</h1>
+    <p class="lead">Os projetos de deputados e senadores desde fevereiro de 2023, separados por assunto. Escolha um assunto ou vá direto a um tema específico.</p>
+    ${trilho(g.tot)}${legend(g.tot)}
+  </section>
+  <section class="block"><ul class="rows">${TKEYS.map((k,ti)=>{const c=g.temas[k];const subs=CORE.subs.map((x,j)=>[j,x]).filter(([j,x])=>x[0]===ti&&x[1]!=='Outros');
+    return `<li style="display:flex;flex-direction:column;gap:10px"><a class="tema-row" href="#tema-${k}"><span class="tn">${TEMAS[k]}</span>${trilho(c,true)}<span class="tc">${nf(sum(c))} projetos, ${nf(c[0])} ${c[0]===1?'virou':'viraram'} lei</span></a>
+      <div class="tags">${subs.map(([j,x])=>`<a href="#tema-${k}-s${j}">${esc(x[1])}</a>`).join('')}</div></li>`;}).join('')}</ul>
+    <p class="small muted">Um projeto pode estar em mais de um assunto. A separação em temas específicos é automática.</p></section></div>`;
+}
+function vNotFound(){view.innerHTML=`<div class="block"><h1 class="page">Página não encontrada</h1><p><a href="#inicio">Voltar ao início</a></p></div>`;}
+
+/* ---------- rotas ---------- */
+/* ---------- páginas legais ----------
+   Preencha os dados do responsável SÓ aqui. Enquanto estiverem entre colchetes, aparecem destacados na página. */
+const LEGAL={
+  nome:'Mateus Vinícius Silva',
+  email:'oquefizeramporvoce@gmail.com',
+  atualizado:'16 de novembro de 2026'
+};
+const lg=v=>/^\[/.test(v)?`<mark class="pend">${v}</mark>`:v;
+function legalShell(titulo,corpo){
+  view.innerHTML=`<div class="prose legal">
+  <p class="crumb"><a href="#inicio">Mapa</a></p>
+  <h1 class="page">${titulo}</h1>
+  <p class="muted">Última atualização: ${LEGAL.atualizado}</p>
+  ${corpo}
+  <p class="legal-nav">Veja também: <a href="#privacidade">Política de Privacidade</a>, <a href="#termos">Termos de Uso</a>, <a href="#cookies">Política de Cookies</a> e <a href="#contato">Contato</a>.</p>
+  </div>`;
+}
+function vPrivacidade(){legalShell('Política de Privacidade',`
+<p class="lead">Este site mostra dados públicos do Congresso Nacional. Ele não tem cadastro, login, comentários nem formulários, e não coleta dados pessoais de quem o visita. Esta página explica isso e o que acontece com os poucos dados que podem circular.</p>
+<h2>1. Quem é o responsável</h2>
+<p>O responsável pelo site (controlador, nos termos da Lei Geral de Proteção de Dados, Lei nº 13.709/2018) é ${lg(LEGAL.nome)}, pessoa física. Contato para assuntos de privacidade: ${lg(LEGAL.email)}.</p>
+<h2>2. Dados de quem visita o site</h2>
+<p>O site não pede nome, e-mail, telefone nem qualquer outro dado, e não usa cookies, ferramentas de análise de audiência, pixels de anúncios ou botões de redes sociais. O que você digita nas buscas e nos filtros é processado no seu próprio navegador e não é enviado a nós.</p>
+<p>Como qualquer site, o servidor que entrega as páginas pode registrar dados técnicos de acesso, como o endereço IP, a data e a hora e o tipo de navegador. Esses registros são gerados pela plataforma de hospedagem, que atua como operadora, e servem para segurança e funcionamento. O site não usa esses registros para identificar ou perfilar visitantes.</p>
+<p>A fonte de texto é entregue pelo próprio site. Não carregamos fontes, scripts ou imagens de servidores de terceiros.</p>
+<h2>3. Resumos em linguagem simples</h2>
+<p>Alguns projetos têm um resumo escrito com apoio de inteligência artificial e revisado por uma pessoa. Esses textos já estão gravados no site. Ao abrir uma página, nenhum dado seu é enviado a qualquer serviço para gerar ou carregar o resumo.</p>
+<h2>4. Dados dos parlamentares</h2>
+<p>O site exibe nome, partido, estado, proposições, votos e presença de deputados federais e senadores. São dados pessoais de acesso público, divulgados oficialmente pela Câmara dos Deputados e pelo Senado Federal em seus portais de dados abertos, no exercício de mandato público. Eles são tratados para informar o cidadão sobre a atividade legislativa, com base na transparência e no interesse público. A LGPD determina que o tratamento de dados de acesso público considere a finalidade, a boa-fé e o interesse público.</p>
+<p>Não exibimos dados de contato pessoal, endereço, documentos nem informações da vida privada dos parlamentares. Os dados são copiados das fontes oficiais em uma data de referência, que aparece no rodapé. Se algo estiver desatualizado ou errado, a fonte oficial prevalece.</p>
+<h2>5. Compartilhamento</h2>
+<p>Não vendemos nem compartilhamos dados de visitantes. O único terceiro envolvido é a plataforma de hospedagem, que entrega as páginas.</p>
+<h2>6. Seus direitos</h2>
+<p>Pela LGPD, a pessoa a quem os dados se referem pode pedir confirmação de que existe tratamento, acesso, correção de dados incompletos ou desatualizados, eliminação ou anonimização quando cabível, informações sobre compartilhamento e outros direitos previstos na lei. Isso vale para visitantes e também para parlamentares que queiram pedir a correção de um dado exibido. Escreva para ${lg(LEGAL.email)} e responderemos em prazo razoável. Você também pode recorrer à Autoridade Nacional de Proteção de Dados (ANPD).</p>
+<h2>7. Segurança e retenção</h2>
+<p>Como o site não coleta dados de visitantes, a retenção se limita aos registros técnicos da hospedagem, que seguem a política da plataforma.</p>
+<h2>8. Crianças e adolescentes</h2>
+<p>O site não é direcionado a crianças e não coleta dados de ninguém, incluindo menores de idade.</p>
+<h2>9. Mudanças nesta política</h2>
+<p>Se o site passar a coletar algum dado (por exemplo, formulário de contato ou análise de audiência), esta política será atualizada antes disso, com a nova data no topo.</p>`);}
+function vTermos(){legalShell('Termos de Uso',`
+<p class="lead">Ao usar este site você concorda com as regras abaixo. Elas são curtas de propósito.</p>
+<h2>1. O que é este site</h2>
+<p>“O que eles fizeram por você” é um projeto independente de transparência. Ele reúne dados públicos da Câmara dos Deputados e do Senado Federal e os apresenta de forma organizada e em linguagem simples. Não tem ligação com o Congresso Nacional, com partidos, candidatos ou órgãos do governo. É operado por ${lg(LEGAL.nome)}.</p>
+<h2>2. Natureza informativa e limites</h2>
+<ul>
+<li>As informações têm caráter informativo e não substituem as fontes oficiais, que prevalecem em caso de diferença.</li>
+<li>Temas, situação (“parado”, “em andamento”) e subtópicos são classificados automaticamente por regras do site e podem conter erros.</li>
+<li>Os resumos em linguagem simples são escritos com apoio de inteligência artificial e revisados por uma pessoa. Mesmo revisados, podem simplificar demais: a ementa e o texto oficial prevalecem.</li>
+<li>Os dados são uma cópia feita na data de referência exibida no rodapé e não são atualizados em tempo real.</li>
+<li>Os números de presença seguem métodos diferentes na Câmara e no Senado e não são comparáveis entre as Casas. O site mostra cada método na página “Como funciona”.</li>
+<li>Presença, votos e propostas não medem sozinhos a qualidade do trabalho de um parlamentar. O site não faz avaliação política, não recomenda voto e não apoia candidato ou partido.</li>
+</ul>
+<h2>3. Ausência de garantias</h2>
+<p>O site é oferecido “como está”. Fazemos o possível para que os dados sejam corretos, mas não garantimos que estejam sempre completos, atualizados ou disponíveis. Não nos responsabilizamos por decisões tomadas com base apenas nas informações do site; confira a fonte oficial antes de citar ou decidir.</p>
+<h2>4. Uso permitido</h2>
+<p>Você pode navegar, citar e compartilhar links do site. Ao citar, indique a fonte original dos dados (Câmara dos Deputados e Senado Federal) e a data de referência. Não use o site de forma que prejudique seu funcionamento, nem tente acessá-lo por meios automatizados abusivos.</p>
+<h2>5. Propriedade intelectual</h2>
+<p>Os dados são de fonte pública e oficial. O desenho do mapa vem de <a href="https://github.com/VictorCazanave/svg-maps" target="_blank" rel="noopener">SVG Maps</a>, de Victor Cazanave, licença CC BY 4.0. A fonte Atkinson Hyperlegible Next é licenciada sob a SIL Open Font License 1.1. O texto, o layout e a organização do site pertencem ao responsável, salvo indicação contrária.</p>
+<h2>6. Correções e pedidos</h2>
+<p>Encontrou um erro ou é parlamentar e quer pedir uma correção? Escreva para ${lg(LEGAL.email)}, indicando a página e o problema. Corrigiremos o que for procedente.</p>
+<h2>7. Mudanças e lei aplicável</h2>
+<p>Estes termos podem mudar; a data da última atualização fica no topo. Eles são regidos pela lei brasileira.</p>`);}
+function vCookies(){legalShell('Política de Cookies',`
+<p class="lead">Este site não usa cookies. Por isso não exibimos aviso de cookies.</p>
+<h2>O que são cookies</h2>
+<p>Cookies são pequenos arquivos que um site grava no seu navegador para lembrar quem você é, medir audiência ou mostrar anúncios. Tecnologias parecidas, como armazenamento local e pixels, têm a mesma função.</p>
+<h2>O que este site faz</h2>
+<ul>
+<li>Não grava cookies nem usa armazenamento local do navegador para identificar você.</li>
+<li>Não usa Google Analytics, Meta Pixel, anúncios, mapas incorporados, vídeos incorporados ou chats de terceiros.</li>
+<li>Carrega a fonte de texto do próprio site, sem pedir nada a servidores de terceiros.</li>
+</ul>
+<h2>Plataforma de hospedagem</h2>
+<p>O site é entregue por uma plataforma de hospedagem, que pode usar cookies ou registros técnicos próprios para segurança e funcionamento. Eles não são controlados por nós nem usados para identificar visitantes. Se quiser, você pode bloquear ou apagar cookies nas configurações do navegador.</p>
+<h2>Se isso mudar</h2>
+<p>Se o site passar a usar cookies não essenciais, como análise de audiência ou publicidade, pediremos seu consentimento antes de ativá-los, com opção de recusar, e esta política será atualizada.</p>`);}
+function vContato(){legalShell('Contato',`
+<p class="lead">Para correções, pedidos sobre dados pessoais ou dúvidas sobre o site, escreva para o responsável.</p>
+<ul>
+<li>Responsável: ${lg(LEGAL.nome)}</li>
+<li>E-mail: ${lg(LEGAL.email)}</li>
+</ul>
+<p>Ao pedir uma correção, informe a página (o endereço) e o que está errado, com a fonte oficial se possível.</p>`);}
+
+function route(){
+  const h=decodeURIComponent(location.hash.replace(/^#/,''))||'inicio';
+  S.lastView=h;S.list=null;
+  let nav='inicio';
+  if(h==='inicio')vInicio();
+  else if(/^estado-[a-z]{2}$/.test(h)){S.uf=h.slice(7).toUpperCase();S.lastView='inicio';vInicio();}
+  else if(h.startsWith('tema-')){nav='assuntos';const m=h.match(/^tema-([a-z]+)(?:-s(\d+))?$/);m?vTema(m[1],m[2]!=null?+m[2]:null):vNotFound();}
+  else if(h.startsWith('p-')){vProjeto(h.slice(2));nav='';}
+  else if(/^[ds]-\d+$/.test(h)){vParl(h.replace('-',''));nav='parlamentares';}
+  else if(h==='parlamentares'){vParlamentares();nav=h;}
+  else if(h.startsWith('partido-')){const sl=h.slice(8);const pt=[...new Set(CORE.parl.map(p=>p[P.pt]))].find(x=>slug(x)===sl)||'';S.parl.q='';S.parl.casa='';S.parl.uf='';vParlamentares(pt);nav='partidos';}
+  else if(h==='partidos'){vPartidos();nav=h;}
+  else if(h==='assuntos'){vAssuntos();nav=h;}
+  else if(h==='votacoes'){vVotacoes();nav=h;}
+  else if(h==='busca'){vBusca();nav='';}
+  else if(h==='como-funciona'){vComo();nav=h;}
+  else if(h==='privacidade'){vPrivacidade();nav='';}
+  else if(h==='termos'){vTermos();nav='';}
+  else if(h==='cookies'){vCookies();nav='';}
+  else if(h==='contato'){vContato();nav='';}
+  else vNotFound();
+  document.querySelectorAll('.nav a').forEach(a=>{if(a.dataset.nav===nav)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');});
+  const h1=document.querySelector('#view h1');
+  document.title=(h!=='inicio'&&h1?h1.textContent.trim()+' · ':'')+'O que eles fizeram por você';
+  window.scrollTo(0,0);
+}
+
+/* ---------- eventos ---------- */
+document.addEventListener('click',e=>{
+  const b=e.target.closest('[data-act]');if(!b)return;const act=b.dataset.act;
+  if(act==='ufsel'){selectUF(b.dataset.uf);}
+  else if(act==='pvall'){const t=document.getElementById('pv-body');if(t&&S.pv){t.innerHTML=pvRows(S.pv);b.remove();}}
+  else if(act==='sub'){const j=+b.dataset.j;const cur=b.getAttribute('aria-pressed')==='true';location.hash=cur?`tema-${b.dataset.k}`:`tema-${b.dataset.k}-s${j}`;}
+  else if(act==='casa'){S.casa=b.dataset.c;const y=window.scrollY;vInicio();window.scrollTo(0,y);}
+  else if(act==='bk'){const i=+b.dataset.b;S.list.bk.has(i)?S.list.bk.delete(i):S.list.bk.add(i);S.list.page=1;drawList();}
+  else if(act==='more'){S.list.page++;drawList();}
+  else if(act==='autab'){S.parlTab.t=+b.dataset.t;drawParlList();}
+  else if(act==='ufgo'){e.preventDefault();S.parl={q:'',casa:'',uf:b.dataset.uf,pt:'',sort:'lei',page:1,todos:false};if(location.hash==='#parlamentares')route();else location.hash='parlamentares';}
+  else if(act==='pmore'){S.parl.page++;drawParl();}
+  else if(act==='vmore'){S.vot.page=(S.vot.page||1)+1;drawVotes();}
+  else if(act==='vcasa'){S.vot.casa=b.dataset.c;S.vot.page=1;b.parentElement.querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b));drawVotes();}
+});
+document.addEventListener('input',e=>{
+  const t=e.target;
+  if(t.id==='lq'){S.list.q=t.value;S.list.page=1;drawList();}
+  else if(t.id==='pq'){S.parl.q=t.value;S.parl.page=1;drawParl();}
+  else if(t.id==='lleg'){S.list.leg=!t.checked;S.list.page=1;drawList();}
+});
+document.addEventListener('change',e=>{
+  const t=e.target;
+  if(t.id==='lori'){S.list.ori=t.value;S.list.page=1;drawList();}
+  else if(t.id==='lsort'){S.list.sort=t.value;S.list.page=1;drawList();}
+  else if(t.id==='pcasa'){S.parl.casa=t.value;S.parl.page=1;drawParl();}
+  else if(t.id==='puf'){S.parl.uf=t.value;S.parl.page=1;drawParl();}
+  else if(t.id==='ppt'){S.parl.pt=t.value;S.parl.page=1;drawParl();}
+  else if(t.id==='ptodos'){S.parl.todos=t.checked;S.parl.page=1;drawParl();}
+  else if(t.id==='psort'){S.parl.sort=t.value;S.parl.page=1;drawParl();}
+  else if(t.id==='vano'){S.vot.ano=t.value;S.vot.page=1;drawVotes();}
+});
+document.getElementById('busca-form').addEventListener('submit',e=>{
+  e.preventDefault();S.q=document.getElementById('busca-q').value;
+  if(location.hash==='#busca')route();else location.hash='busca';
+});
+window.addEventListener('hashchange',route);
+loadCore().then(route).catch(()=>{view.innerHTML=`<div class="block"><h1 class="page">Não foi possível carregar os dados</h1><p>Recarregue a página. Se o erro continuar, o arquivo de dados não foi publicado junto com o site.</p></div>`;});
+</script>
+</body>
+</html>
