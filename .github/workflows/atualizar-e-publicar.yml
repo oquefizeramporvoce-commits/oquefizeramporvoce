@@ -1,0 +1,75 @@
+# Toda segunda-feira de manhã (horário de Brasília) coleta os dados abertos da Câmara e do
+# Senado, gera os arquivos do site, grava no repositório e publica no GitHub Pages.
+# Também publica sempre que algo em site/ muda na branch main.
+#
+# Para rodar na hora: aba Actions > "Atualizar dados e publicar" > Run workflow.
+
+name: Atualizar dados e publicar
+
+on:
+  schedule:
+    - cron: '17 9 * * 1'      # segunda-feira, 09:17 UTC = 06:17 em Brasília
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['site/**']
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: atualizar-e-publicar
+  cancel-in-progress: false
+
+jobs:
+  dados:
+    if: github.event_name != 'push'
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Coletar dados das APIs da Câmara e do Senado
+        run: python scripts/coletar.py
+
+      - name: Gerar os arquivos do site
+        run: python scripts/build.py .
+
+      - name: Gravar no repositório
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add raw site/data
+          if git diff --cached --quiet; then
+            echo "Nada mudou desde a última coleta."
+            exit 0
+          fi
+          git commit -m "Dados atualizados em $(TZ=America/Sao_Paulo date +%d/%m/%Y)"
+          git push
+
+  publicar:
+    needs: dados
+    if: always() && (needs.dados.result == 'success' || needs.dados.result == 'skipped')
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+      - id: deploy
+        uses: actions/deploy-pages@v4

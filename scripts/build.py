@@ -7,12 +7,13 @@ Saída:    site/data/core.json (agregados, parlamentares, votações)
 import json, re, sys, unicodedata, collections, datetime, os
 
 ROOT = sys.argv[1]
-REF = datetime.date(2026, 11, 13)
 LEG_START = '2023-02-01'
 STALL_DAYS = 180
 
 cam = json.load(open(os.path.join(ROOT, 'raw/camara.json'), encoding='utf-8'))
 sen = json.load(open(os.path.join(ROOT, 'raw/senado.json'), encoding='utf-8'))
+# data de referência: a da coleta (raw/camara.json), para "parado há mais de 6 meses" contar a partir dela
+REF = datetime.date.fromisoformat(cam['ref'])
 
 SIGLAS = ['PL', 'PLP', 'PEC']
 BUCKETS = ['lei', 'apr', 'and', 'par', 'ape', 'enc']
